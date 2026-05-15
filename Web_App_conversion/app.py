@@ -65,3 +65,75 @@ def upload():
     order_file.write_text("\n".join(files))
     return jsonify({"added": added, "total": len(files)})
 
+@app.route("/files")
+def list_files():
+    sid = session.get("sid")
+    if not sid:
+        return jsonify({"files": []})
+    sdir = session_dir(sid)
+    order_file = sdir / "order.txt"
+    if not order_file.exists():
+        return jsonify({"files": []})
+    result = []
+    for line in order_file.read_text().splitlines():
+        if "|||" not in line:
+            continue
+        safe, orig = line.split("|||", 1)
+        result.append({"id": safe, "name": orig,
+                        "ext": Path(orig).suffix.lower()})
+    return jsonify({"files": result})
+
+
+@app.route("/reorder", methods=["POST"])
+def reorder():
+    sid = session.get("sid")
+    if not sid:
+        return jsonify({"ok": False}), 400
+    sdir = session_dir(sid)
+    order_file = sdir / "order.txt"
+    new_ids = request.json.get("ids", [])
+    if not order_file.exists():
+        return jsonify({"ok": False}), 400
+
+    mapping = {}
+    for line in order_file.read_text().splitlines():
+        if "|||" in line:
+            safe, orig = line.split("|||", 1)
+            mapping[safe] = orig
+
+    new_lines = [f"{nid}|||{mapping[nid]}" for nid in new_ids if nid in mapping]
+    order_file.write_text("\n".join(new_lines))
+    return jsonify({"ok": True})
+
+
+@app.route("/remove", methods=["POST"])
+def remove():
+    sid = session.get("sid")
+    if not sid:
+        return jsonify({"ok": False}), 400
+    sdir = session_dir(sid)
+    order_file = sdir / "order.txt"
+    file_id = request.json.get("id")
+    if not order_file.exists():
+        return jsonify({"ok": False}), 400
+
+    lines = order_file.read_text().splitlines()
+    new_lines = [l for l in lines if not l.startswith(file_id + "|||")]
+    order_file.write_text("\n".join(new_lines))
+
+    target = sdir / file_id
+    if target.exists():
+        target.unlink()
+    return jsonify({"ok": True})
+
+
+@app.route("/clear", methods=["POST"])
+def clear():
+    sid = session.get("sid")
+    if not sid:
+        return jsonify({"ok": True})
+    sdir = session_dir(sid)
+    if sdir.exists():
+        shutil.rmtree(sdir)
+    sdir.mkdir(parents=True, exist_ok=True)
+    return jsonify({"ok": True})
