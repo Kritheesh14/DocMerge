@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Merge Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ── Reset & Tokens ─────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0c0d10;
+    --surface:   #13151a;
+    --card:      #1a1d24;
+    --border:    #252830;
+    --accent:    #5b8fff;
+    --accent2:   #2ddbb4;
+    --danger:    #ff5a5a;
+    --warn:      #ffb347;
+    --text:      #e8eaf0;
+    --muted:     #6b7385;
+    --pdf-clr:   #5b8fff;
+    --ppt-clr:   #2ddbb4;
+    --font-head: 'Syne', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 80px;
+    background-image:
+      radial-gradient(ellipse 60% 40% at 70% 10%, rgba(91,143,255,.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 35% at 20% 80%, rgba(45,219,180,.05) 0%, transparent 60%);
+  }
+
+  /* ── Layout ─────────────────────────────────────────────────────────── */
+  .shell {
+    width: 100%;
+    max-width: 760px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  /* ── Header ─────────────────────────────────────────────────────────── */
+  header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+  }
