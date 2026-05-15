@@ -58,3 +58,326 @@
     border-bottom: 1px solid var(--border);
     padding-bottom: 20px;
   }
+.logo { display: flex; flex-direction: column; gap: 4px; }
+  .logo-title {
+    font-family: var(--font-head);
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(100deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .logo-sub { font-size: .72rem; color: var(--muted); letter-spacing: .08em; }
+  .counter {
+    font-size: .72rem;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 999px;
+    letter-spacing: .06em;
+  }
+  .counter span { color: var(--accent); font-weight: 500; }
+
+  /* ── Legend ─────────────────────────────────────────────────────────── */
+  .legend {
+    display: flex;
+    gap: 20px;
+    font-size: .72rem;
+    color: var(--muted);
+    letter-spacing: .05em;
+  }
+  .legend-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  /* ── Drop Zone ───────────────────────────────────────────────────────── */
+  .drop-zone {
+    border: 1.5px dashed var(--border);
+    border-radius: 16px;
+    padding: 40px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative;
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--accent);
+    background: rgba(91,143,255,.04);
+  }
+  .drop-zone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  }
+  .drop-icon { font-size: 2.4rem; margin-bottom: 12px; }
+  .drop-title {
+    font-family: var(--font-head);
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .drop-hint { font-size: .72rem; color: var(--muted); line-height: 1.6; }
+  .drop-hint em { color: var(--accent); font-style: normal; }
+
+  /* ── File List ───────────────────────────────────────────────────────── */
+  .list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: .72rem;
+    color: var(--muted);
+    letter-spacing: .07em;
+    text-transform: uppercase;
+  }
+  .btn-clear {
+    background: none;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .15s;
+    letter-spacing: .05em;
+  }
+  .btn-clear:hover { background: rgba(255,90,90,.1); }
+
+  #file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 60px;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    font-size: .8rem;
+    padding: 32px;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    letter-spacing: .04em;
+  }
+
+  /* ── File Row ────────────────────────────────────────────────────────── */
+  .file-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    transition: transform .15s, box-shadow .15s, opacity .15s;
+    cursor: grab;
+    user-select: none;
+  }
+  .file-row:active { cursor: grabbing; }
+  .file-row.dragging {
+    opacity: .4;
+    transform: scale(.98);
+  }
+  .file-row.drag-target {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(91,143,255,.25);
+  }
+
+  .drag-handle { color: var(--muted); font-size: .9rem; cursor: grab; flex-shrink: 0; }
+  .row-index {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .72rem; font-weight: 500;
+    flex-shrink: 0;
+  }
+  .row-index.pdf { background: rgba(91,143,255,.15); color: var(--pdf-clr); }
+  .row-index.pptx { background: rgba(45,219,180,.15); color: var(--ppt-clr); }
+
+  .row-icon { font-size: 1.1rem; flex-shrink: 0; }
+  .row-name {
+    flex: 1;
+    font-size: .82rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text);
+  }
+  .row-ext {
+    font-size: .68rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    letter-spacing: .06em;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .row-ext.pdf { background: rgba(91,143,255,.12); color: var(--pdf-clr); }
+  .row-ext.pptx { background: rgba(45,219,180,.12); color: var(--ppt-clr); }
+
+  .row-btns { display: flex; gap: 5px; flex-shrink: 0; }
+  .icon-btn {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 7px;
+    color: var(--muted);
+    font-size: .8rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: color .15s, border-color .15s, background .15s;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--accent); background: rgba(91,143,255,.08); }
+  .icon-btn.remove:hover { color: var(--danger); border-color: var(--danger); background: rgba(255,90,90,.08); }
+ /* ── Mode Badge ──────────────────────────────────────────────────────── */
+  #mode-badge {
+    font-size: .72rem;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border-left: 3px solid;
+    background: var(--surface);
+    letter-spacing: .04em;
+    display: none;
+  }
+  #mode-badge.pdf   { border-color: var(--pdf-clr);  color: var(--pdf-clr); }
+  #mode-badge.pptx  { border-color: var(--ppt-clr);  color: var(--ppt-clr); }
+  #mode-badge.mixed { border-color: var(--warn);      color: var(--warn); }
+
+  /* ── Merge Button ────────────────────────────────────────────────────── */
+  .merge-row { display: flex; gap: 12px; }
+  #merge-btn {
+    flex: 1;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-family: var(--font-head);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: .03em;
+    cursor: pointer;
+    background: linear-gradient(110deg, var(--accent), var(--accent2));
+    color: #06080d;
+    transition: opacity .2s, transform .1s;
+    position: relative;
+    overflow: hidden;
+  }
+  #merge-btn:disabled { opacity: .4; cursor: not-allowed; }
+  #merge-btn:not(:disabled):hover { opacity: .9; transform: translateY(-1px); }
+  #merge-btn:not(:disabled):active { transform: translateY(0); }
+
+  /* ── Toast ───────────────────────────────────────────────────────────── */
+  #toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-size: .8rem;
+    color: var(--text);
+    transition: transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 100;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  #toast.error { border-color: var(--danger); color: var(--danger); }
+  #toast.success { border-color: var(--accent2); color: var(--accent2); }
+
+  /* ── Progress ────────────────────────────────────────────────────────── */
+  .progress-wrap {
+    height: 3px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+    display: none;
+  }
+  .progress-bar {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    width: 0%;
+    transition: width .4s;
+  }
+  .progress-wrap.active { display: block; }
+  .progress-wrap.indeterminate .progress-bar {
+    width: 40%;
+    animation: slide 1.4s ease-in-out infinite;
+  }
+  @keyframes slide {
+    0%   { margin-left: -40%; }
+    100% { margin-left: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-title">Merge Studio</div>
+      <div class="logo-sub">PDF · PPTX · Merge everything</div>
+    </div>
+    <div class="counter"><span id="count">0</span> / 20 files</div>
+  </header>
+
+  <!-- Legend -->
+  <div class="legend">
+    <span><span class="legend-dot" style="background:var(--pdf-clr)"></span>PDF</span>
+    <span><span class="legend-dot" style="background:var(--ppt-clr)"></span>PPTX / PPT</span>
+    <span style="margin-left:auto">Drag rows to reorder</span>
+  </div>
+
+  <!-- Drop Zone -->
+  <div class="drop-zone" id="drop-zone">
+    <input type="file" id="file-input" multiple accept=".pdf,.pptx,.ppt" />
+    <div class="drop-icon">⬆</div>
+    <div class="drop-title">Drop files here or click to browse</div>
+    <div class="drop-hint">
+      Accepts <em>PDF</em> and <em>PPTX / PPT</em> · Max <em>20 files</em><br>
+      Mixed formats → PPTXs auto-converted to PDF, then merged
+    </div>
+  </div>
+
+  <!-- File list -->
+  <div>
+    <div class="list-header">
+      <span>Queue</span>
+      <button class="btn-clear" id="clear-btn">Clear all</button>
+    </div>
+  </div>
+
+  <div id="file-list">
+    <div class="empty-state">No files yet — add some above</div>
+  </div>
+
+  <!-- Mode badge -->
+  <div id="mode-badge"></div>
+
+  <!-- Progress -->
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+
+  <!-- Merge -->
+  <div class="merge-row">
+    <button id="merge-btn" disabled>⚡ Merge Files</button>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+/* ── State ──────────────────────────────────────────────────────────────── */
+let files = []; // [{id, name, ext}]
+let dragSrc = null;
