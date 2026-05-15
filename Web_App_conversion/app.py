@@ -65,6 +65,7 @@ def upload():
     order_file.write_text("\n".join(files))
     return jsonify({"added": added, "total": len(files)})
 
+
 @app.route("/files")
 def list_files():
     sid = session.get("sid")
@@ -138,6 +139,7 @@ def clear():
     sdir.mkdir(parents=True, exist_ok=True)
     return jsonify({"ok": True})
 
+
 @app.route("/merge", methods=["POST"])
 def merge():
     sid = session.get("sid")
@@ -185,6 +187,7 @@ def merge():
                          as_attachment=True, download_name=dl_name)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 # ── Core merge helpers ────────────────────────────────────────────────────────
 
