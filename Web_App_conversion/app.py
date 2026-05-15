@@ -137,3 +137,104 @@ def clear():
         shutil.rmtree(sdir)
     sdir.mkdir(parents=True, exist_ok=True)
     return jsonify({"ok": True})
+
+@app.route("/merge", methods=["POST"])
+def merge():
+    sid = session.get("sid")
+    if not sid:
+        return jsonify({"error": "No session"}), 400
+    sdir = session_dir(sid)
+    order_file = sdir / "order.txt"
+    if not order_file.exists():
+        return jsonify({"error": "No files uploaded"}), 400
+
+    entries = [(line.split("|||")[0], line.split("|||")[1])
+               for line in order_file.read_text().splitlines() if "|||" in line]
+    if len(entries) < 2:
+        return jsonify({"error": "Upload at least 2 files"}), 400
+
+    paths = [str(sdir / safe) for safe, _ in entries]
+    exts = {Path(orig).suffix.lower() for _, orig in entries}
+    all_pdf  = exts <= {".pdf"}
+    all_pptx = exts <= {".pptx", ".ppt"}
+
+    try:
+        if all_pdf:
+            out, mime, dl_name = merge_pdfs(paths), "application/pdf", "merged.pdf"
+        elif all_pptx:
+            out, mime, dl_name = (merge_pptx(paths),
+                                  "application/vnd.openxmlformats-officedocument"
+                                  ".presentationml.presentation",
+                                  "merged.pptx")
+        else:
+            pdf_paths = []
+            tmpdir = tempfile.mkdtemp()
+            try:
+                for safe, orig in entries:
+                    p = str(sdir / safe)
+                    if Path(orig).suffix.lower() == ".pdf":
+                        pdf_paths.append(p)
+                    else:
+                        pdf_paths.append(pptx_to_pdf(p, tmpdir))
+                out = merge_pdfs(pdf_paths)
+            finally:
+                shutil.rmtree(tmpdir, ignore_errors=True)
+            mime, dl_name = "application/pdf", "merged.pdf"
+
+        return send_file(out, mimetype=mime,
+                         as_attachment=True, download_name=dl_name)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ── Core merge helpers ────────────────────────────────────────────────────────
+
+def merge_pdfs(paths):
+    from pypdf import PdfWriter, PdfReader
+    writer = PdfWriter()
+    for p in paths:
+        for page in PdfReader(p).pages:
+            writer.add_page(page)
+    out = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
+    writer.write(out)
+    out.close()
+    return out.name
+
+
+def merge_pptx(paths):
+    import copy
+    from pptx import Presentation
+    base = Presentation(paths[0])
+    for p in paths[1:]:
+        src = Presentation(p)
+        for slide in src.slides:
+            layout_idx = min(
+                len(base.slide_layouts) - 1,
+                src.slides.index(slide)
+            )
+            new_slide = base.slides.add_slide(base.slide_layouts[layout_idx])
+            for ph in new_slide.placeholders:
+                ph._element.getparent().remove(ph._element)
+            for shape in slide.shapes:
+                new_slide.shapes._spTree.insert(2, copy.deepcopy(shape._element))
+    out = tempfile.NamedTemporaryFile(suffix=".pptx", delete=False)
+    out.close()
+    base.save(out.name)
+    return out.name
+
+
+def pptx_to_pdf(pptx_path, out_dir):
+    result = subprocess.run(
+        ["libreoffice", "--headless", "--convert-to", "pdf",
+         "--outdir", out_dir, pptx_path],
+        capture_output=True, text=True, timeout=120
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"LibreOffice conversion failed: {result.stderr}")
+    out = Path(out_dir) / (Path(pptx_path).stem + ".pdf")
+    if not out.exists():
+        raise FileNotFoundError(f"Converted PDF not found: {out}")
+    return str(out)
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
