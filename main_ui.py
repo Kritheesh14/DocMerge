@@ -132,7 +132,7 @@ class DocumentMergerApp:
 
             if not out:
                 return
-            
+
             if mode == "pdf":
                 PDF_Handler.merge_pdfs(self.files, out, self._update_status)
             elif mode == "pptx":
@@ -141,6 +141,11 @@ class DocumentMergerApp:
                 Handling_Mixed_Docs.merge_mixed(self.files, out, self._update_status)
             
             messagebox.showinfo("Success", f"File successfully saved to:\n{out}")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+        finally:
+            self._update_status("Ready to process", 0)
+            self.btn_merge.state(['!disabled'])
 
 if __name__ == "__main__":
     root = tk.Tk()
