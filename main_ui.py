@@ -111,21 +111,36 @@ class DocumentMergerApp:
         try:
             exts = {Path(f).suffix.lower() for f in self.files}
             if exts <= {'.pdf'}:
-                out = utils.get_desktop_output_path("merged.pdf")
-                PDF_Handler.merge_pdfs(self.files, out, self._update_status)
+                default_name = "merged.pdf"
+                file_types = [("PDF Document", "*.pdf")]
+                mode = "pdf"
             elif exts <= {'.pptx', '.ppt'}:
-                out = utils.get_desktop_output_path("merged.pptx")
+                default_name = "merged.pptx"
+                file_types = [("PowerPoint Presentation", "*.pptx")]
+                mode = "pptx"
+            else:
+                default_name = "merged.pdf"
+                file_types = [("PDF Document", "*.pdf")]
+                mode = "mixed"
+
+            out = filedialog.asksaveasfilename(
+                title="Save Merged File As",
+                initialfile=default_name,
+                filetypes=file_types,
+                defaultextension=f".{mode if mode != 'mixed' else 'pdf'}"
+            )
+
+            if not out:
+                return
+            
+            if mode == "pdf":
+                PDF_Handler.merge_pdfs(self.files, out, self._update_status)
+            elif mode == "pptx":
                 PPT_Handler.merge_pptx(self.files, out, self._update_status)
             else:
-                out = utils.get_desktop_output_path("merged.pdf")
                 Handling_Mixed_Docs.merge_mixed(self.files, out, self._update_status)
             
-            messagebox.showinfo("Success", f"File saved to Desktop!")
-        except Exception as e:
-            messagebox.showerror("Error", str(e))
-        finally:
-            self._update_status("Ready to process", 0)
-            self.btn_merge.state(['!disabled'])
+            messagebox.showinfo("Success", f"File successfully saved to:\n{out}")
 
 if __name__ == "__main__":
     root = tk.Tk()
