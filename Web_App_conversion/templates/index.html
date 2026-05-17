@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  /* ── Reset & Tokens ─────────────────────────────────────────────────── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
@@ -41,7 +40,6 @@
       radial-gradient(ellipse 50% 35% at 20% 80%, rgba(45,219,180,.05) 0%, transparent 60%);
   }
 
-  /* ── Layout ─────────────────────────────────────────────────────────── */
   .shell {
     width: 100%;
     max-width: 760px;
@@ -50,7 +48,6 @@
     gap: 28px;
   }
 
-  /* ── Header ─────────────────────────────────────────────────────────── */
   header {
     display: flex;
     align-items: flex-end;
@@ -58,7 +55,7 @@
     border-bottom: 1px solid var(--border);
     padding-bottom: 20px;
   }
-.logo { display: flex; flex-direction: column; gap: 4px; }
+  .logo { display: flex; flex-direction: column; gap: 4px; }
   .logo-title {
     font-family: var(--font-head);
     font-size: 2rem;
@@ -81,7 +78,6 @@
   }
   .counter span { color: var(--accent); font-weight: 500; }
 
-  /* ── Legend ─────────────────────────────────────────────────────────── */
   .legend {
     display: flex;
     gap: 20px;
@@ -97,7 +93,6 @@
     vertical-align: middle;
   }
 
-  /* ── Drop Zone ───────────────────────────────────────────────────────── */
   .drop-zone {
     border: 1.5px dashed var(--border);
     border-radius: 16px;
@@ -124,7 +119,6 @@
   .drop-hint { font-size: .72rem; color: var(--muted); line-height: 1.6; }
   .drop-hint em { color: var(--accent); font-style: normal; }
 
-  /* ── File List ───────────────────────────────────────────────────────── */
   .list-header {
     display: flex;
     align-items: center;
@@ -165,7 +159,6 @@
     letter-spacing: .04em;
   }
 
-  /* ── File Row ────────────────────────────────────────────────────────── */
   .file-row {
     display: flex;
     align-items: center;
@@ -233,7 +226,7 @@
   }
   .icon-btn:hover { color: var(--text); border-color: var(--accent); background: rgba(91,143,255,.08); }
   .icon-btn.remove:hover { color: var(--danger); border-color: var(--danger); background: rgba(255,90,90,.08); }
- /* ── Mode Badge ──────────────────────────────────────────────────────── */
+
   #mode-badge {
     font-size: .72rem;
     padding: 8px 16px;
@@ -245,9 +238,51 @@
   }
   #mode-badge.pdf   { border-color: var(--pdf-clr);  color: var(--pdf-clr); }
   #mode-badge.pptx  { border-color: var(--ppt-clr);  color: var(--ppt-clr); }
-  #mode-badge.mixed { border-color: var(--warn);      color: var(--warn); }
+  #mode-badge.mixed { border-color: var(--warn);     color: var(--warn); }
 
-  /* ── Merge Button ────────────────────────────────────────────────────── */
+  .naming-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .naming-label {
+    font-size: .72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .07em;
+  }
+  .naming-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0 14px;
+  }
+  .naming-input-wrapper:focus-within {
+    border-color: var(--accent);
+  }
+  .filename-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: .85rem;
+    padding: 12px 0;
+  }
+  .filename-ext-preview {
+    font-size: .85rem;
+    color: var(--muted);
+    padding-left: 4px;
+    user-select: none;
+  }
+
   .merge-row { display: flex; gap: 12px; }
   #merge-btn {
     flex: 1;
@@ -269,7 +304,6 @@
   #merge-btn:not(:disabled):hover { opacity: .9; transform: translateY(-1px); }
   #merge-btn:not(:disabled):active { transform: translateY(0); }
 
-  /* ── Toast ───────────────────────────────────────────────────────────── */
   #toast {
     position: fixed;
     bottom: 32px;
@@ -291,7 +325,6 @@
   #toast.error { border-color: var(--danger); color: var(--danger); }
   #toast.success { border-color: var(--accent2); color: var(--accent2); }
 
-  /* ── Progress ────────────────────────────────────────────────────────── */
   .progress-wrap {
     height: 3px;
     background: var(--border);
@@ -320,7 +353,6 @@
 <body>
 <div class="shell">
 
-  <!-- Header -->
   <header>
     <div class="logo">
       <div class="logo-title">Merge Studio</div>
@@ -329,14 +361,12 @@
     <div class="counter"><span id="count">0</span> / 20 files</div>
   </header>
 
-  <!-- Legend -->
   <div class="legend">
     <span><span class="legend-dot" style="background:var(--pdf-clr)"></span>PDF</span>
     <span><span class="legend-dot" style="background:var(--ppt-clr)"></span>PPTX / PPT</span>
     <span style="margin-left:auto">Drag rows to reorder</span>
   </div>
 
-  <!-- Drop Zone -->
   <div class="drop-zone" id="drop-zone">
     <input type="file" id="file-input" multiple accept=".pdf,.pptx,.ppt" />
     <div class="drop-icon">⬆</div>
@@ -347,7 +377,6 @@
     </div>
   </div>
 
-  <!-- File list -->
   <div>
     <div class="list-header">
       <span>Queue</span>
@@ -359,42 +388,45 @@
     <div class="empty-state">No files yet — add some above</div>
   </div>
 
-  <!-- Mode badge -->
   <div id="mode-badge"></div>
 
-  <!-- Progress -->
+  <div class="naming-container">
+    <span class="naming-label">Output Filename</span>
+    <div class="naming-input-wrapper">
+      <input type="text" id="filename-input" class="filename-input" placeholder="merged" value="merged" spellcheck="false" />
+      <span id="ext-preview" class="filename-ext-preview">.pdf</span>
+    </div>
+  </div>
+
   <div class="progress-wrap" id="progress-wrap">
     <div class="progress-bar" id="progress-bar"></div>
   </div>
 
-  <!-- Merge -->
   <div class="merge-row">
     <button id="merge-btn" disabled>⚡ Merge Files</button>
   </div>
 
 </div>
 
-<!-- Toast -->
 <div id="toast"></div>
 
 <script>
-/* ── State ──────────────────────────────────────────────────────────────── */
-let files = []; // [{id, name, ext}]
+let files = [];
 let dragSrc = null;
 
-/* ── DOM refs ─────────────────────────────────────────────────────────── */
 const dropZone   = document.getElementById('drop-zone');
 const fileInput  = document.getElementById('file-input');
 const fileList   = document.getElementById('file-list');
 const countEl    = document.getElementById('count');
 const modeBadge  = document.getElementById('mode-badge');
+const filenameIn = document.getElementById('filename-input');
+const extPreview = document.getElementById('ext-preview');
 const mergeBtn   = document.getElementById('merge-btn');
 const clearBtn   = document.getElementById('clear-btn');
 const progressW  = document.getElementById('progress-wrap');
 const progressB  = document.getElementById('progress-bar');
 const toast      = document.getElementById('toast');
 
-/* ── Init ─────────────────────────────────────────────────────────────── */
 (async () => { await loadFiles(); })();
 
 async function loadFiles() {
@@ -404,7 +436,6 @@ async function loadFiles() {
   render();
 }
 
-/* ── Upload ───────────────────────────────────────────────────────────── */
 fileInput.addEventListener('change', () => uploadFiles(fileInput.files));
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
@@ -439,7 +470,6 @@ async function uploadFiles(fileObjs) {
   fileInput.value = '';
 }
 
-/* ── Remove & Clear ──────────────────────────────────────────────────── */
 async function removeFile(id) {
   await fetch('/remove', { method: 'POST',
     headers: {'Content-Type':'application/json'}, body: JSON.stringify({id}) });
@@ -453,7 +483,6 @@ clearBtn.addEventListener('click', async () => {
   render();
 });
 
-/* ── Reorder ──────────────────────────────────────────────────────────── */
 async function saveOrder() {
   await fetch('/reorder', { method: 'POST',
     headers: {'Content-Type':'application/json'},
@@ -470,14 +499,20 @@ function moveFile(id, dir) {
   saveOrder();
 }
 
-/* ── Merge ────────────────────────────────────────────────────────────── */
 mergeBtn.addEventListener('click', async () => {
   if (files.length < 2) { showToast('Add at least 2 files to merge.', 'error'); return; }
   mergeBtn.disabled = true;
   mergeBtn.textContent = 'Merging…';
   setProgress(true, true);
 
-  const r = await fetch('/merge', { method: 'POST' });
+  const outName = filenameIn.value.trim() || 'merged';
+
+  const r = await fetch('/merge', { 
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ filename: outName })
+  });
+  
   setProgress(false);
   mergeBtn.disabled = false;
   mergeBtn.textContent = '⚡ Merge Files';
@@ -488,41 +523,42 @@ mergeBtn.addEventListener('click', async () => {
     return;
   }
 
-  // Trigger download
   const blob = await r.blob();
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   const cd   = r.headers.get('Content-Disposition') || '';
   const match = cd.match(/filename="?([^"]+)"?/);
-  a.download = match ? match[1] : 'merged.pdf';
+  a.download = match ? match[1] : `${outName}${extPreview.textContent}`;
   a.href = url;
   a.click();
   URL.revokeObjectURL(url);
   showToast('Download started!', 'success');
 });
 
-/* ── Render ───────────────────────────────────────────────────────────── */
 function render() {
   countEl.textContent = files.length;
   mergeBtn.disabled = files.length < 2;
 
-  // Mode badge
   const exts = [...new Set(files.map(f => f.ext))];
   const allPdf  = exts.every(e => e === '.pdf');
   const allPptx = exts.every(e => e === '.pptx' || e === '.ppt');
   if (files.length === 0) {
     modeBadge.style.display = 'none';
+    extPreview.textContent = '.pdf';
   } else {
     modeBadge.style.display = 'block';
     if (allPdf) {
       modeBadge.className = 'pdf';
       modeBadge.textContent = '→ All PDFs detected — output will be a merged PDF';
+      extPreview.textContent = '.pdf';
     } else if (allPptx) {
       modeBadge.className = 'pptx';
       modeBadge.textContent = '→ All presentations detected — output will be a merged PPTX';
+      extPreview.textContent = '.pptx';
     } else {
       modeBadge.className = 'mixed';
       modeBadge.textContent = '→ Mixed formats — PPTXs will be converted to PDF, then merged';
+      extPreview.textContent = '.pdf';
     }
   }
 
@@ -550,7 +586,6 @@ function render() {
         <button class="icon-btn" title="Move down" onclick="moveFile('${f.id}',1)">▼</button>
         <button class="icon-btn remove" title="Remove" onclick="removeFile('${f.id}')">✕</button>
       </div>`;
-    // Drag-and-drop reorder
     row.addEventListener('dragstart', () => { dragSrc = f.id; row.classList.add('dragging'); });
     row.addEventListener('dragend',   () => row.classList.remove('dragging'));
     row.addEventListener('dragover',  e => { e.preventDefault(); row.classList.add('drag-target'); });
@@ -569,13 +604,11 @@ function render() {
   });
 }
 
-/* ── Progress ─────────────────────────────────────────────────────────── */
 function setProgress(active, indeterminate = false) {
   progressW.className = 'progress-wrap' + (active ? ' active' : '') + (indeterminate ? ' indeterminate' : '');
   if (!active) progressB.style.width = '0%';
 }
 
-/* ── Toast ────────────────────────────────────────────────────────────── */
 let toastTimer;
 function showToast(msg, type = '') {
   clearTimeout(toastTimer);
@@ -586,4 +619,3 @@ function showToast(msg, type = '') {
 </script>
 </body>
 </html>
-
