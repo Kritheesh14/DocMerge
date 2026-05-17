@@ -25,13 +25,11 @@ def session_dir(sid):
     return d
 
 
-# ── Routes ────────────────────────────────────────────────────────────────────
-
 @app.route("/")
 def index():
     if "sid" not in session:
         session["sid"] = str(uuid.uuid4())
-    return render_template("index.html")
+    return render_template("index1.html")
 
 
 @app.route("/upload", methods=["POST"])
@@ -40,7 +38,6 @@ def upload():
     session["sid"] = sid
     sdir = session_dir(sid)
 
-    # Load existing order list
     order_file = sdir / "order.txt"
     files = order_file.read_text().splitlines() if order_file.exists() else []
 
@@ -155,6 +152,11 @@ def merge():
     if len(entries) < 2:
         return jsonify({"error": "Upload at least 2 files"}), 400
 
+    req_data = request.get_json(silent=True) or {}
+    custom_name = req_data.get("filename", "").strip()
+    if not custom_name:
+        custom_name = "merged"
+
     paths = [str(sdir / safe) for safe, _ in entries]
     exts = {Path(orig).suffix.lower() for _, orig in entries}
     all_pdf  = exts <= {".pdf"}
@@ -162,12 +164,12 @@ def merge():
 
     try:
         if all_pdf:
-            out, mime, dl_name = merge_pdfs(paths), "application/pdf", "merged.pdf"
+            out, mime, dl_name = merge_pdfs(paths), "application/pdf", f"{custom_name}.pdf"
         elif all_pptx:
             out, mime, dl_name = (merge_pptx(paths),
                                   "application/vnd.openxmlformats-officedocument"
                                   ".presentationml.presentation",
-                                  "merged.pptx")
+                                  f"{custom_name}.pptx")
         else:
             pdf_paths = []
             tmpdir = tempfile.mkdtemp()
@@ -181,15 +183,13 @@ def merge():
                 out = merge_pdfs(pdf_paths)
             finally:
                 shutil.rmtree(tmpdir, ignore_errors=True)
-            mime, dl_name = "application/pdf", "merged.pdf"
+            mime, dl_name = "application/pdf", f"{custom_name}.pdf"
 
         return send_file(out, mimetype=mime,
                          as_attachment=True, download_name=dl_name)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-# ── Core merge helpers ────────────────────────────────────────────────────────
 
 def merge_pdfs(paths):
     from pypdf import PdfWriter, PdfReader
