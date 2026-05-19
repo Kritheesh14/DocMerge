@@ -1,6 +1,5 @@
 import os
 import shutil
-import subprocess
 import tempfile
 import uuid
 from pathlib import Path
@@ -226,17 +225,33 @@ def merge_pptx(paths):
 
 
 def pptx_to_pdf(pptx_path, out_dir):
-    result = subprocess.run(
-        ["libreoffice", "--headless", "--convert-to", "pdf",
-         "--outdir", out_dir, pptx_path],
-        capture_output=True, text=True, timeout=120
-    )
-    if result.returncode != 0:
-        raise RuntimeError(f"LibreOffice conversion failed: {result.stderr}")
-    out = Path(out_dir) / (Path(pptx_path).stem + ".pdf")
-    if not out.exists():
-        raise FileNotFoundError(f"Converted PDF not found: {out}")
-    return str(out)
+    import win32com.client
+    import pythoncom
+    
+    pythoncom.CoInitialize()
+    
+    abs_pptx_path = os.path.abspath(pptx_path)
+    output_pdf_path = os.path.abspath(os.path.join(out_dir, Path(pptx_path).stem + ".pdf"))
+    
+    powerpoint = None
+    presentation = None
+    try:
+        powerpoint = win32com.client.DispatchEx("PowerPoint.Application")
+        presentation = powerpoint.Presentations.Open(abs_pptx_path, WithWindow=False)
+        presentation.SaveAs(output_pdf_path, FileFormat=32)
+        
+    except Exception as e:
+        raise RuntimeError(f"Native Windows PowerPoint conversion failed: {str(e)}")
+    finally:
+        if presentation:
+            presentation.Close()
+        if powerpoint:
+            powerpoint.Quit()
+            
+    if not os.path.exists(output_pdf_path):
+        raise FileNotFoundError("PowerPoint completed execution, but the output PDF path is missing.")
+        
+    return output_pdf_path
 
 
 if __name__ == "__main__":
