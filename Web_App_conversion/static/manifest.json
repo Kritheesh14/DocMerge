@@ -1,0 +1,24 @@
+{
+  "name": "Merge Studio",
+  "short_name": "MergeStudio",
+  "description": "An aesthetic studio environment for merging PDF and PPTX/PPT files.",
+  "version": "1.0.0",
+  "theme_color": "#0c0d10",
+  "background_color": "#0c0d10",
+  "display": "standalone",
+  "start_url": "/index.html",
+  "file_handlers": [
+    {
+      "action": "/index.html",
+      "accept": {
+        "application/pdf": [".pdf"],
+        "application/vnd.ms-powerpoint": [".ppt"],
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation": [".pptx"]
+      }
+    }
+  ],
+  "limits": {
+    "max_files_allowed": 20,
+    "accepted_extensions": [".pdf", ".pptx", ".ppt"]
+  }
+}
