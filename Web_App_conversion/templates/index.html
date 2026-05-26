@@ -4,6 +4,200 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Merge Studio</title>
+  
+  <link rel="manifest" href="/static/manifest.json">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Neue+Haas+Grotesk+Display+Pro:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="bg-grain"></div>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<div class="bg-orb bg-orb-3"></div>
+<div class="bg-lines"></div>
+
+<div id="welcome-page">
+  <nav class="welcome-nav">
+    <div class="nav-wordmark">Merge Studio</div>
+    <div class="nav-tag">Document Tools &nbsp;/&nbsp; v1.0</div>
+  </nav>
+
+  <div class="welcome-hero">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-line"></div>
+      <span class="hero-eyebrow-text">Document Workspace</span>
+      <div class="hero-eyebrow-line" style="transform: rotate(180deg);"></div>
+    </div>
+
+    <h1 class="hero-title">
+      Everything
+      <em>merges here</em>
+    </h1>
+
+    <p class="hero-subtitle">
+      A refined studio for combining PDF and presentation files — with elegance, precision, and zero friction.
+    </p>
+
+    <div class="capability-grid">
+      <div class="cap-cell">
+        <svg class="cap-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 4h14l6 6v18H6V4z" stroke="var(--amber-lt)" stroke-width="1.2" stroke-linejoin="round"/>
+          <path d="M20 4v6h6" stroke="var(--amber-lt)" stroke-width="1.2" stroke-linejoin="round"/>
+          <path d="M10 16h12M10 20h8" stroke="var(--amber-lt)" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        <div class="cap-title">PDF Merge</div>
+        <div class="cap-desc">Combine multiple PDF documents into a single, clean file while preserving all content.</div>
+      </div>
+
+      <div class="cap-cell">
+        <svg class="cap-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="6" width="24" height="20" rx="1.5" stroke="var(--ppt-clr)" stroke-width="1.2"/>
+          <path d="M4 11h24" stroke="var(--ppt-clr)" stroke-width="1.2"/>
+          <rect x="8" y="15" width="10" height="7" rx="1" stroke="var(--ppt-clr)" stroke-width="1.2"/>
+          <path d="M21 15h3M21 18h3M21 21h2" stroke="var(--ppt-clr)" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        <div class="cap-title">PPTX Merge</div>
+        <div class="cap-desc">Stack slide decks together into one unified presentation, maintaining layouts and themes.</div>
+      </div>
+
+      <div class="cap-cell">
+        <svg class="cap-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 6h8l4 4v4" stroke="var(--amber-lt)" stroke-width="1.2" stroke-linejoin="round"/>
+          <path d="M16 6v4h4" stroke="var(--amber-lt)" stroke-width="1.2" stroke-linejoin="round"/>
+          <path d="M4 18h11M4 22h7" stroke="var(--amber-lt)" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M20 14h8l-4 4v8h-4v-8l-4-4h4z" stroke="var(--ppt-clr)" stroke-width="1.2" stroke-linejoin="round"/>
+          <path d="M16 20h12" stroke="var(--ppt-clr)" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        <div class="cap-title">Mixed Formats</div>
+        <div class="cap-desc">Blend PDF and PPTX files freely. Presentations are auto-converted before merging.</div>
+      </div>
+    </div>
+
+    <div class="welcome-cta-row">
+      <button class="btn-primary" onclick="enterApp()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Open Merge Studio
+      </button>
+      <button class="btn-secondary" onclick="enterApp()">Start merging &rarr;</button>
+    </div>
+  </div>
+
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <div class="ticker-item">Merge PDFs <span class="ticker-sep"></span></div>
+      <div class="ticker-item">Combine Slide Decks <span class="ticker-sep"></span></div>
+      <div class="ticker-item">Reorder Pages <span class="ticker-sep"></span></div>
+      <div class="ticker-item">Auto Convert PPTX <span class="ticker-sep"></span></div>
+      <div class="ticker-item">Download Instantly <span class="ticker-sep"></span></div>
+      <div class="ticker-item">Up to 20 Files <span class="ticker-sep"></span></div>
+      <div class="ticker-item">Mixed Formats <span class="ticker-sep"></span></div>
+      <div class="ticker-item">Drag &amp; Drop <span class="ticker-sep"></span></div>
+      <div class="ticker-item">Merge PDFs <span class="ticker-sep"></span></div>
+      <div class="ticker-item">Combine Slide Decks <span class="ticker-sep"></span></div>
+      <div class="ticker-item">Reorder Pages <span class="ticker-sep"></span></div>
+      <div class="ticker-item">Auto Convert PPTX <span class="ticker-sep"></span></div>
+      <div class="ticker-item">Download Instantly <span class="ticker-sep"></span></div>
+      <div class="ticker-item">Up to 20 Files <span class="ticker-sep"></span></div>
+      <div class="ticker-item">Mixed Formats <span class="ticker-sep"></span></div>
+      <div class="ticker-item">Drag &amp; Drop <span class="ticker-sep"></span></div>
+    </div>
+  </div>
+
+  <footer class="welcome-footer">
+    <div class="welcome-footer-left">Merge Studio &copy; 2025</div>
+    <div class="footer-dots">
+      <div class="footer-dot active"></div>
+      <div class="footer-dot"></div>
+      <div class="footer-dot"></div>
+    </div>
+  </footer>
+</div>
+
+<div id="app-page">
+  <div class="app-bg-orb-1"></div>
+
+  <div class="shell">
+    <div class="app-header">
+      <div class="app-header-left">
+        <button class="back-btn" onclick="goBack()" title="Back to home">
+          <svg viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="app-logo">
+          <div class="app-logo-title">Merge Studio</div>
+          <div class="app-logo-sub">PDF &middot; PPTX &middot; Merge everything</div>
+        </div>
+      </div>
+      <div class="counter"><span id="count">0</span> / 20 files</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="legend-dot" style="background:var(--pdf-clr)"></span>PDF</span>
+      <span><span class="legend-dot" style="background:var(--ppt-clr)"></span>PPTX / PPT</span>
+      <span style="margin-left:auto; font-size: 0.6rem;">Drag rows to reorder</span>
+    </div>
+
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="file-input" multiple accept=".pdf,.pptx,.ppt" />
+      <div class="drop-icon">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 28V12M12 20l8-8 8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 30h24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="drop-title">Drop files here or click to browse</div>
+      <div class="drop-hint">
+        Accepts <em>PDF</em> and <em>PPTX / PPT</em> &middot; Max <em>20 files</em><br>
+        Mixed formats &rarr; PPTXs auto-converted to PDF, then merged
+      </div>
+    </div>
+
+    <div>
+      <div class="list-header">
+        <span>Queue</span>
+        <button class="btn-clear" id="clear-btn">Clear all</button>
+      </div>
+    </div>
+
+    <div id="file-list">
+      <div class="empty-state">No files yet &mdash; add some above</div>
+    </div>
+
+    <div id="mode-badge"></div>
+
+    <div class="naming-container">
+      <span class="naming-label">Output Filename</span>
+      <div class="naming-input-wrapper">
+        <input type="text" id="filename-input" class="filename-input" placeholder="merged" value="merged" spellcheck="false" />
+        <span id="ext-preview" class="filename-ext-preview">.pdf</span>
+      </div>
+    </div>
+
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div class="merge-row">
+      <button id="merge-btn" disabled>Merge Files</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Merge Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
