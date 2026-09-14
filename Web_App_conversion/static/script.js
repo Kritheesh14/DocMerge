@@ -225,3 +225,8 @@ function showToast(msg, type = '') {
   toast.className = 'show' + (type ? ' ' + type : '');
   toastTimer = setTimeout(() => { toast.className = ''; }, 3200);
 }
+
+/* ============================================
+   DOCUMENT TOOL STATE
+============================================ */
+let activeTool = 'merge';
