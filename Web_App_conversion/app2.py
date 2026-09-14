@@ -1,3 +1,4 @@
+import io
 import os
 import shutil
 import tempfile
@@ -12,6 +13,9 @@ app.secret_key = os.urandom(24)
 UPLOAD_FOLDER = tempfile.mkdtemp(prefix="merger_")
 ALLOWED_EXTENSIONS = {".pdf", ".pptx", ".ppt"}
 MAX_FILES = 20
+
+# Point-to-EMU conversion factor used when laying out converted PPTX slides
+PT_TO_EMU = 12700
 
 
 def allowed(filename):
