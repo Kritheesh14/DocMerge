@@ -193,6 +193,32 @@ def merge():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+@app.route("/convert/word", methods=["POST"])
+def convert_word():
+    f = request.files.get("file")
+    if not f or not f.filename or Path(f.filename).suffix.lower() != ".pdf":
+        return jsonify({"error": "Please provide a PDF file."}), 400
+
+    tmpdir = tempfile.mkdtemp(prefix="conv_")
+    try:
+        src_path = os.path.join(tmpdir, "input.pdf")
+        f.save(src_path)
+        out_path = os.path.join(tmpdir, "output.docx")
+        pdf_to_docx(src_path, out_path)
+
+        dl_name = f"{Path(f.filename).stem}.docx"
+        return send_file(
+            out_path,
+            mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            as_attachment=True,
+            download_name=dl_name,
+        )
+    except Exception as e:
+        return jsonify({"error": f"Conversion failed: {e}"}), 500
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
 def pdf_to_docx(pdf_path, output_path):
     """Convert a PDF into an editable Word document, preserving layout
     (text, tables, and images) as closely as pdf2docx can reconstruct it."""
