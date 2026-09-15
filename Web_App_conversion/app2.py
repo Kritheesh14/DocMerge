@@ -193,6 +193,17 @@ def merge():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+def pdf_to_docx(pdf_path, output_path):
+    """Convert a PDF into an editable Word document, preserving layout
+    (text, tables, and images) as closely as pdf2docx can reconstruct it."""
+    from pdf2docx import Converter
+
+    cv = Converter(pdf_path)
+    try:
+        cv.convert(output_path)
+    finally:
+        cv.close()
+    return output_path
 
 def merge_pdfs(paths):
     from pypdf import PdfWriter, PdfReader
