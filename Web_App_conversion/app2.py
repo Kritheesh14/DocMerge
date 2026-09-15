@@ -197,17 +197,24 @@ def merge():
 @app.route("/convert/word", methods=["POST"])
 def convert_word():
     f = request.files.get("file")
-    if not f or not f.filename or Path(f.filename).suffix.lower() != ".pdf":
+
+    if not f:
+        return jsonify({"error": "Please provide a PDF file."}), 400
+
+    filename = Path(f.filename).name
+
+    if not filename or Path(filename).suffix.lower() != ".pdf":
         return jsonify({"error": "Please provide a PDF file."}), 400
 
     tmpdir = tempfile.mkdtemp(prefix="conv_")
+    
     try:
-        src_path = os.path.join(tmpdir, "input.pdf")
+        src_path = os.path.join(tmpdir, filename)
         f.save(src_path)
         out_path = os.path.join(tmpdir, "output.docx")
         pdf_to_docx(src_path, out_path)
 
-        dl_name = f"{Path(f.filename).stem}.docx"
+        dl_name = f"{Path(filename).stem}.docx"
         return send_file(
             out_path,
             mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
