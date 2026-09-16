@@ -238,37 +238,44 @@ def pdf_to_docx(pdf_path, output_path):
         cv.close()
     return output_path
 
-def pdf_to_pptx(pdf_path, output_path):
-    """Convert each PDF page into a PowerPoint slide."""
-    import fitz
-    from pptx import Presentation
-    from pptx.util import Inches
 
-    pdf = fitz.open(pdf_path)
-    prs = Presentation()
+@app.route("/convert/ppt", methods=["POST"])
+def convert_ppt():
+    f = request.files.get("file")
 
-    # Use a standard widescreen presentation size.
-    prs.slide_width = Inches(13.333333)
-    prs.slide_height = Inches(7.5)
+    if not f:
+        return jsonify({"error": "Please provide a PDF file."}), 400
 
-    for page in pdf:
-        slide = prs.slides.add_slide(prs.slide_layouts[6])
+    filename = Path(f.filename).name
 
-        pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), alpha=False)
-        image_stream = io.BytesIO(pix.tobytes("png"))
+    if not filename or Path(filename).suffix.lower() != ".pdf":
+        return jsonify({"error": "Please provide a PDF file."}), 400
 
-        slide.shapes.add_picture(
-            image_stream,
-            0,
-            0,
-            width=prs.slide_width,
-            height=prs.slide_height,
+    tmpdir = tempfile.mkdtemp(prefix="conv_")
+
+    try:
+        src_path = os.path.join(tmpdir, filename)
+        f.save(src_path)
+
+        out_path = os.path.join(tmpdir, "output.pptx")
+        pdf_to_pptx(src_path, out_path)
+
+        dl_name = f"{Path(filename).stem}.pptx"
+
+        return send_file(
+            out_path,
+            mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            as_attachment=True,
+            download_name=dl_name,
         )
 
-    pdf.close()
-    prs.save(output_path)
+    except Exception as e:
+        return jsonify({"error": f"Conversion failed: {e}"}), 500
 
-    return output_path
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
 def merge_pdfs(paths):
     from pypdf import PdfWriter, PdfReader
     writer = PdfWriter()
