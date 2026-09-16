@@ -238,6 +238,37 @@ def pdf_to_docx(pdf_path, output_path):
         cv.close()
     return output_path
 
+def pdf_to_pptx(pdf_path, output_path):
+    """Convert each PDF page into a PowerPoint slide."""
+    import fitz
+    from pptx import Presentation
+    from pptx.util import Inches
+
+    pdf = fitz.open(pdf_path)
+    prs = Presentation()
+
+    # Use a standard widescreen presentation size.
+    prs.slide_width = Inches(13.333333)
+    prs.slide_height = Inches(7.5)
+
+    for page in pdf:
+        slide = prs.slides.add_slide(prs.slide_layouts[6])
+
+        pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), alpha=False)
+        image_stream = io.BytesIO(pix.tobytes("png"))
+
+        slide.shapes.add_picture(
+            image_stream,
+            0,
+            0,
+            width=prs.slide_width,
+            height=prs.slide_height,
+        )
+
+    pdf.close()
+    prs.save(output_path)
+
+    return output_path
 def merge_pdfs(paths):
     from pypdf import PdfWriter, PdfReader
     writer = PdfWriter()
