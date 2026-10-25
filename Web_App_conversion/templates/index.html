@@ -27,31 +27,39 @@
   </div>
   <p id="console-caption" aria-live="polite"></p>
 
-  <input type="file" id="file-input" multiple accept=".pdf,.pptx,.ppt" />
+  <input type="file" id="file-input" multiple accept=".pdf,.pptx,.ppt" hidden />
 
-  <div class="shell">
-    <div class="counter"><span id="count">0</span> / 20 files</div>
+  <section class="queue" id="queue">
+    <div class="queue-head">
+      <span>Queue &nbsp;<span id="count">0</span> / 20 files</span>
+      <button class="btn-clear" id="clear-btn">Clear all</button>
+    </div>
     <div class="legend">
       <span><span class="legend-dot" style="background:var(--pdf-clr)"></span>PDF</span>
       <span><span class="legend-dot" style="background:var(--ppt-clr)"></span>PPTX / PPT</span>
+      <span class="tip" style="margin-left:auto">Drag ⣿ to reorder. Drag a row onto the ring to use all files.</span>
     </div>
-    <div id="file-list">
-      <div class="empty-state">No files yet &mdash; add some above</div>
-    </div>
+    <div id="file-list"></div>
     <div id="mode-badge"></div>
     <div class="naming-container">
-      <span class="naming-label">Output Filename</span>
+      <span class="naming-label">Merged file name</span>
       <div class="naming-input-wrapper">
         <input type="text" id="filename-input" class="filename-input" value="merged" spellcheck="false" />
         <span id="ext-preview" class="filename-ext-preview">.pdf</span>
       </div>
     </div>
-    <div class="progress-wrap" id="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
-  </div>
+    <div class="progress-wrap" id="progress-wrap"><div class="progress-bar"></div></div>
+  </section>
 </main>
 
 <div class="ticker-wrap">
   <div class="ticker-track">
+    <div class="ticker-item">Merge PDFs <span class="ticker-sep"></span></div>
+    <div class="ticker-item">Combine slide decks <span class="ticker-sep"></span></div>
+    <div class="ticker-item">PDF to Word <span class="ticker-sep"></span></div>
+    <div class="ticker-item">PDF to PowerPoint <span class="ticker-sep"></span></div>
+    <div class="ticker-item">Mixed formats <span class="ticker-sep"></span></div>
+    <div class="ticker-item">Up to 20 files <span class="ticker-sep"></span></div>
     <div class="ticker-item">Merge PDFs <span class="ticker-sep"></span></div>
     <div class="ticker-item">Combine slide decks <span class="ticker-sep"></span></div>
     <div class="ticker-item">PDF to Word <span class="ticker-sep"></span></div>
