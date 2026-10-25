@@ -125,6 +125,90 @@ body {
   letter-spacing: .08em;
 }
 
+/* RADIAL CONSOLE */
+.console {
+  position: relative;
+  width: min(94vw, 620px, 80vh);
+  aspect-ratio: 600 / 460;
+}
+#ring {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#ring text { pointer-events: none; text-anchor: middle; }
+.halo {
+  fill: rgba(240,232,223,.03);
+  stroke: rgba(240,232,223,.08);
+  opacity: 0;
+  transition: opacity .35s;
+}
+.console.is-open .halo { opacity: 1; }
+
+.hub { cursor: pointer; outline: none; }
+.hub .hub-bd { fill: var(--border2); stroke: var(--border2); stroke-width: 14; stroke-linejoin: round; transition: all .2s; }
+.hub .hub-fl { fill: var(--plum); stroke: var(--plum); stroke-width: 10; transition: all .2s; }
+.hub:hover .hub-fl, .hub:focus-visible .hub-fl, .console.file-over .hub-fl { fill: var(--amber); stroke: var(--amber); }
+.console.file-over .hub-bd { fill: var(--amber-lt); stroke: var(--amber-lt); }
+.hub .hub-lb { fill: var(--cream); font: italic 27px var(--font-serif); }
+.hub .hub-ic { fill: none; stroke: var(--cream); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.hub .hub-x, .console.is-open .hub .hub-up { display: none; }
+.console.is-open .hub .hub-x { display: inline; }
+.console.busy .hub { pointer-events: none; }
+.hub-spin { fill: none; stroke: var(--amber-lt); stroke-width: 3; stroke-dasharray: 60 506; opacity: 0; transform-origin: 0 0; }
+.console.busy .hub-spin { opacity: 1; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.petal {
+  --acc: var(--amber-lt);
+  outline: none;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: translate(var(--tx), var(--ty)) scale(.3);
+  transition: transform .45s cubic-bezier(.2,.9,.25,1.1) calc(var(--i, 0) * 45ms), opacity .3s calc(var(--i, 0) * 45ms), visibility 0s .5s;
+}
+.petal .bd { fill: var(--border2); stroke: var(--border2); stroke-width: 14; stroke-linejoin: round; transition: all .15s; }
+.petal .fl { fill: var(--card); stroke: var(--card); stroke-width: 10; stroke-linejoin: round; transition: all .15s; }
+.petal .lb { fill: var(--cream); font: italic 22px var(--font-serif); }
+.petal .sb { fill: var(--muted); font: 11px var(--font-mono); letter-spacing: .04em; }
+
+.console.is-open .petal.main,
+.console[data-exp="merge"] .petal.kid[data-parent="merge"],
+.console[data-exp="convert"] .petal.kid[data-parent="convert"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  transition-delay: calc(var(--i, 0) * 45ms), calc(var(--i, 0) * 45ms), 0s;
+}
+.console[data-exp="merge"] .petal.main[data-op="merge"],
+.console[data-exp="convert"] .petal.main[data-op="convert"] {
+  opacity: .3;
+  transform: scale(.93);
+}
+.petal:hover .bd, .petal.is-hover .bd, .petal:focus-visible .bd { fill: var(--acc); stroke: var(--acc); }
+.petal:hover .fl, .petal.is-hover .fl, .petal:focus-visible .fl { fill: color-mix(in srgb, var(--acc) 24%, var(--card)); stroke: color-mix(in srgb, var(--acc) 24%, var(--card)); }
+.petal.disabled { cursor: not-allowed; }
+.petal.disabled .lb, .petal.disabled .sb { fill: var(--muted2); }
+.petal.disabled:hover .bd, .petal.disabled.is-hover .bd { fill: #ff5a5a; stroke: #ff5a5a; }
+.petal.disabled:hover .fl, .petal.disabled.is-hover .fl { fill: var(--card); stroke: var(--card); }
+
+#console-caption {
+  margin-top: 6px;
+  min-height: 1.4em;
+  font-size: .72rem;
+  color: var(--muted);
+  letter-spacing: .04em;
+  text-align: center;
+  max-width: 440px;
+}
+
 .list-header {
   display: flex;
   align-items: center;
