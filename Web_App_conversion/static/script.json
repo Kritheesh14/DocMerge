@@ -52,6 +52,17 @@ document.querySelector('.hub').addEventListener('click', () => {
   consoleCaption.textContent = consoleEl.classList.contains('is-open') ? 'Select an operation' : '';
 });
 
+ring.addEventListener('click', e => {
+  const petal = e.target.closest('.petal.main');
+  if (!petal) return;
+  const op = petal.dataset.op;
+  if (op === 'merge') {
+    executeMerge();
+  } else {
+    showToast(`${op.charAt(0).toUpperCase() + op.slice(1)} mode selected`, 'success');
+  }
+});
+
 (async () => { await loadFiles(); })();
 
 async function loadFiles() {
@@ -119,6 +130,41 @@ function moveFile(id, dir) {
   [files[i], files[j]] = [files[j], files[i]];
   render();
   saveOrder();
+}
+
+async function executeMerge() {
+  if (files.length < 2) { showToast('Add at least 2 files to merge.', 'error'); return; }
+  consoleEl.classList.add('busy');
+  setProgress(true, true);
+  const outName = filenameIn.value.trim() || 'merged';
+  try {
+    const r = await fetch('/merge', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ filename: outName })
+    });
+    setProgress(false);
+    consoleEl.classList.remove('busy');
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      showToast(d.error || 'Merge failed.', 'error');
+      return;
+    }
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const cd = r.headers.get('Content-Disposition') || '';
+    const match = cd.match(/filename="?([^"]+)"?/);
+    a.download = match ? match[1] : `${outName}${extPreview.textContent}`;
+    a.href = url;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Download started', 'success');
+  } catch(e) {
+    setProgress(false);
+    consoleEl.classList.remove('busy');
+    showToast('Merge failed.', 'error');
+  }
 }
 
 function render() {
