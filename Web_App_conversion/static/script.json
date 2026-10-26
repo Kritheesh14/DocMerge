@@ -1,67 +1,39 @@
+function enterApp() {
+  const welcome = document.getElementById('welcome-page');
+  const app = document.getElementById('app-page');
+  welcome.classList.add('exiting');
+  setTimeout(() => {
+    welcome.style.display = 'none';
+    app.classList.add('visible');
+  }, 650);
+}
+
+function goBack() {
+  const welcome = document.getElementById('welcome-page');
+  const app = document.getElementById('app-page');
+  app.classList.remove('visible');
+  app.style.display = 'none';
+  welcome.style.display = '';
+  welcome.classList.remove('exiting');
+  welcome.style.opacity = '1';
+  welcome.style.transform = 'none';
+}
+
 let files = [];
 let dragSrc = null;
 
-const consoleEl = document.getElementById('console');
-const ring = document.getElementById('ring');
-const consoleCaption = document.getElementById('console-caption');
-const fileInput = document.getElementById('file-input');
-const queueSec = document.getElementById('queue');
-const fileList = document.getElementById('file-list');
-const countEl = document.getElementById('count');
-const modeBadge = document.getElementById('mode-badge');
+const dropZone   = document.getElementById('drop-zone');
+const fileInput  = document.getElementById('file-input');
+const fileList   = document.getElementById('file-list');
+const countEl    = document.getElementById('count');
+const modeBadge  = document.getElementById('mode-badge');
 const filenameIn = document.getElementById('filename-input');
 const extPreview = document.getElementById('ext-preview');
-const clearBtn = document.getElementById('clear-btn');
-const progressW = document.getElementById('progress-wrap');
-const progressB = document.getElementById('progress-bar');
-const toast = document.getElementById('toast');
-
-const OPERATIONS = [
-  { id: 'merge', label: 'Merge', sub: 'PDF & PPTX', x: 150, y: 160 },
-  { id: 'convert', label: 'Convert', sub: 'Formats', x: 450, y: 160 },
-  { id: 'compress', label: 'Compress', sub: 'Reduce size', x: 150, y: 360 },
-  { id: 'split', label: 'Split', sub: 'Extract pages', x: 450, y: 360 }
-];
-
-function buildConsole() {
-  let html = `<circle class="halo" cx="300" cy="260" r="190" />`;
-  html += `<g class="hub" tabindex="0" role="button" aria-label="Toggle console">
-    <circle class="hub-spin" cx="300" cy="260" r="80" />
-    <circle class="hub-bd" cx="300" cy="260" r="70" />
-    <circle class="hub-fl" cx="300" cy="260" r="62" />
-    <text class="hub-lb" x="300" y="268">Studio</text>
-    <path class="hub-ic hub-up" d="M288 252l12-12 12 12" />
-    <path class="hub-ic hub-x" d="M290 250l20 20M310 250l-20 20" />
-  </g>`;
-  
-  OPERATIONS.forEach((op, i) => {
-    html += `<g class="petal main" data-op="${op.id}" style="--i:${i}; --tx:${op.x - 300}px; --ty:${op.y - 260}px" tabindex="0" role="button">
-      <rect class="bd" x="${op.x - 55}" y="${op.y - 35}" width="110" height="70" rx="16" />
-      <rect class="fl" x="${op.x - 51}" y="${op.y - 31}" width="102" height="62" rx="12" />
-      <text class="lb" x="${op.x}" y="${op.y - 2}">${op.label}</text>
-      <text class="sb" x="${op.x}" y="${op.y + 18}">${op.sub}</text>
-    </g>`;
-  });
-  ring.innerHTML = html;
-}
-
-buildConsole();
-
-document.querySelector('.hub').addEventListener('click', () => {
-  consoleEl.classList.toggle('is-open');
-  consoleCaption.textContent = consoleEl.classList.contains('is-open') ? 'Select an operation' : '';
-});
-
-ring.addEventListener('click', e => {
-  const petal = e.target.closest('.petal.main');
-  if (!petal) return;
-  const op = petal.dataset.op;
-  if (op === 'merge') {
-    executeMerge();
-  } else {
-    showToast(`${op.charAt(0).toUpperCase() + op.slice(1)} mode selected`, 'success');
-  }
-});
+const mergeBtn   = document.getElementById('merge-btn');
+const clearBtn   = document.getElementById('clear-btn');
+const progressW  = document.getElementById('progress-wrap');
+const progressB  = document.getElementById('progress-bar');
+const toast      = document.getElementById('toast');
 
 (async () => { await loadFiles(); })();
 
@@ -71,10 +43,17 @@ async function loadFiles() {
     const d = await r.json();
     files = d.files || [];
     render();
-  } catch(e) {}
+  } catch(e) { /* offline / standalone preview */ }
 }
 
 fileInput.addEventListener('change', () => uploadFiles(fileInput.files));
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  uploadFiles(e.dataTransfer.files);
+});
 
 async function uploadFiles(fileObjs) {
   if (!fileObjs.length) return;
@@ -132,9 +111,10 @@ function moveFile(id, dir) {
   saveOrder();
 }
 
-async function executeMerge() {
+mergeBtn.addEventListener('click', async () => {
   if (files.length < 2) { showToast('Add at least 2 files to merge.', 'error'); return; }
-  consoleEl.classList.add('busy');
+  mergeBtn.disabled = true;
+  mergeBtn.textContent = 'Merging...';
   setProgress(true, true);
   const outName = filenameIn.value.trim() || 'merged';
   try {
@@ -144,16 +124,17 @@ async function executeMerge() {
       body: JSON.stringify({ filename: outName })
     });
     setProgress(false);
-    consoleEl.classList.remove('busy');
+    mergeBtn.disabled = false;
+    mergeBtn.textContent = 'Merge Files';
     if (!r.ok) {
       const d = await r.json().catch(() => ({}));
       showToast(d.error || 'Merge failed.', 'error');
       return;
     }
     const blob = await r.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    const cd = r.headers.get('Content-Disposition') || '';
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const cd   = r.headers.get('Content-Disposition') || '';
     const match = cd.match(/filename="?([^"]+)"?/);
     a.download = match ? match[1] : `${outName}${extPreview.textContent}`;
     a.href = url;
@@ -162,22 +143,17 @@ async function executeMerge() {
     showToast('Download started', 'success');
   } catch(e) {
     setProgress(false);
-    consoleEl.classList.remove('busy');
+    mergeBtn.disabled = false;
+    mergeBtn.textContent = 'Merge Files';
     showToast('Merge failed.', 'error');
   }
-}
+});
 
 function render() {
   countEl.textContent = files.length;
-  if (files.length > 0) {
-    queueSec.hidden = false;
-    document.getElementById('stage').classList.add('has-files');
-  } else {
-    queueSec.hidden = true;
-    document.getElementById('stage').classList.remove('has-files');
-  }
+  mergeBtn.disabled = files.length < 2;
   const exts = [...new Set(files.map(f => f.ext))];
-  const allPdf = exts.every(e => e === '.pdf');
+  const allPdf  = exts.every(e => e === '.pdf');
   const allPptx = exts.every(e => e === '.pptx' || e === '.ppt');
   if (files.length === 0) {
     modeBadge.style.display = 'none';
@@ -205,30 +181,30 @@ function render() {
   fileList.innerHTML = '';
   files.forEach((f, i) => {
     const extKey = f.ext === '.pdf' ? 'pdf' : 'pptx';
-    const row = document.createElement('div');
+    const row    = document.createElement('div');
     row.className = 'file-row';
     row.dataset.id = f.id;
     row.draggable = true;
     row.innerHTML = `
-      <span class="drag-handle" title="Drag to reorder">⣿</span>
+      <span class="drag-handle">⣿</span>
       <span class="row-index ${extKey}">${i + 1}</span>
       <span class="row-name" title="${f.name}">${f.name}</span>
       <span class="row-ext ${extKey}">${f.ext.replace('.','').toUpperCase()}</span>
       <div class="row-btns">
-        <button class="icon-btn" title="Move up" onclick="moveFile('${f.id}',-1)">▲</button>
+        <button class="icon-btn" title="Move up"   onclick="moveFile('${f.id}',-1)">▲</button>
         <button class="icon-btn" title="Move down" onclick="moveFile('${f.id}',1)">▼</button>
         <button class="icon-btn remove" title="Remove" onclick="removeFile('${f.id}')">✕</button>
       </div>`;
     row.addEventListener('dragstart', () => { dragSrc = f.id; row.classList.add('dragging'); });
-    row.addEventListener('dragend', () => row.classList.remove('dragging'));
-    row.addEventListener('dragover', e => { e.preventDefault(); row.classList.add('drag-target'); });
+    row.addEventListener('dragend',   () => row.classList.remove('dragging'));
+    row.addEventListener('dragover',  e => { e.preventDefault(); row.classList.add('drag-target'); });
     row.addEventListener('dragleave', () => row.classList.remove('drag-target'));
     row.addEventListener('drop', e => {
       e.preventDefault();
       row.classList.remove('drag-target');
       if (!dragSrc || dragSrc === f.id) return;
       const fromIdx = files.findIndex(x => x.id === dragSrc);
-      const toIdx = files.findIndex(x => x.id === f.id);
+      const toIdx   = files.findIndex(x => x.id === f.id);
       files.splice(toIdx, 0, files.splice(fromIdx, 1)[0]);
       render();
       saveOrder();
