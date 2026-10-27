@@ -15,6 +15,7 @@ UPLOAD_FOLDER = tempfile.mkdtemp(prefix="merger_")
 ALLOWED_EXTENSIONS = {".pdf", ".pptx", ".ppt"}
 MAX_FILES = 20
 
+# Point-to-EMU conversion factor used when laying out converted PPTX slides
 PT_TO_EMU = 12700
 
 
@@ -81,7 +82,7 @@ def list_files():
             continue
         safe, orig = line.split("|||", 1)
         result.append({"id": safe, "name": orig,
-                       "ext": Path(orig).suffix.lower()})
+                        "ext": Path(orig).suffix.lower()})
     return jsonify({"files": result})
 
 
@@ -165,6 +166,7 @@ def merge():
     all_pdf  = exts <= {".pdf"}
     all_pptx = exts <= {".pptx", ".ppt"}
 
+    # mode comes from the console: pdf | pptx | mixed (omitted = auto-detect)
     mode = (req_data.get("mode") or "auto").lower()
     if mode == "pdf" and not all_pdf:
         return jsonify({"error": "Queue contains presentations. Use Mixed."}), 400
@@ -207,6 +209,11 @@ PPTX_MIME = "application/vnd.openxmlformats-officedocument.presentationml.presen
 
 @app.route("/convert/<kind>", methods=["POST"])
 def convert(kind):
+    """Convert PDFs to Word (kind=word) or PowerPoint (kind=ppt).
+
+    Accepts either JSON {"ids": [...]} naming PDFs already in the session queue
+    (used by the console), or a legacy multipart upload with a single "file".
+    One result is returned directly; several are returned as a zip."""
     converters = {"word": (pdf_to_docx, ".docx", DOCX_MIME), "ppt": (pdf_to_pptx, ".pptx", PPTX_MIME)}
     if kind not in converters:
         return jsonify({"error": "Unknown conversion."}), 404
@@ -214,7 +221,7 @@ def convert(kind):
 
     tmpdir = tempfile.mkdtemp(prefix="conv_")
     try:
-        sources = []
+        sources = []  # (path, display stem)
         f = request.files.get("file")
         if f:
             if not f.filename or Path(f.filename).suffix.lower() != ".pdf":
@@ -263,7 +270,10 @@ def convert(kind):
 
 
 def pdf_to_docx(pdf_path, output_path):
+    """Convert a PDF into an editable Word document, preserving layout
+    (text, tables, and images) as closely as pdf2docx can reconstruct it."""
     from pdf2docx import Converter
+
     cv = Converter(pdf_path)
     try:
         cv.convert(output_path)
@@ -273,6 +283,10 @@ def pdf_to_docx(pdf_path, output_path):
 
 
 def pdf_to_pptx(pdf_path, output_path):
+    """Convert a PDF into a PowerPoint deck, one slide per page. Text is
+    rebuilt as real, editable text boxes positioned to match the original
+    layout (best-effort — not a pixel-perfect image copy), and any raster
+    images on the page are placed at their original position and size."""
     import pymupdf
     from pptx import Presentation
     from pptx.util import Emu, Pt
@@ -292,6 +306,7 @@ def pdf_to_pptx(pdf_path, output_path):
         for page in doc:
             slide = prs.slides.add_slide(blank_layout)
 
+            # Place images first so text boxes render above them.
             for img_info in page.get_image_info(xrefs=True):
                 xref = img_info.get("xref", 0)
                 bbox = img_info["bbox"]
@@ -307,11 +322,11 @@ def pdf_to_pptx(pdf_path, output_path):
                         Emu(int((bbox[3] - bbox[1]) * PT_TO_EMU)),
                     )
                 except Exception:
-                    pass
+                    pass  # skip images pptx/pillow can't decode (e.g. some CMYK/JBIG2)
 
             for block in page.get_text("dict").get("blocks", []):
                 if block.get("type") != 0:
-                    continue
+                    continue  # skip image blocks, already handled above
                 bx0, by0, bx1, by1 = block["bbox"]
                 if bx1 <= bx0 or by1 <= by0:
                     continue
