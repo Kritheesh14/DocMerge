@@ -14,7 +14,6 @@ UPLOAD_FOLDER = tempfile.mkdtemp(prefix="merger_")
 ALLOWED_EXTENSIONS = {".pdf", ".pptx", ".ppt"}
 MAX_FILES = 20
 
-# Point-to-EMU conversion factor used when laying out converted PPTX slides
 PT_TO_EMU = 12700
 
 
@@ -49,95 +48,94 @@ def upload():
 
     uploaded = request.files.getlist("files")
     added = []
-
     for f in uploaded:
         if len(files) >= MAX_FILES:
             break
-
         if not f.filename or not allowed(f.filename):
             continue
-
         safe_name = f"{uuid.uuid4().hex}_{Path(f.filename).name}"
         dest = sdir / safe_name
         f.save(dest)
-
         entry = f"{safe_name}|||{f.filename}"
         files.append(entry)
-
-        added.append({
-            "id": safe_name,
-            "name": f.filename,
-            "ext": Path(f.filename).suffix.lower()
-        })
+        added.append({"id": safe_name, "name": f.filename,
+                      "ext": Path(f.filename).suffix.lower()})
 
     order_file.write_text("\n".join(files))
-
-    return jsonify({
-        "added": added,
-        "total": len(files)
-    })
+    return jsonify({"added": added, "total": len(files)})
 
 
 @app.route("/files")
 def list_files():
     sid = session.get("sid")
-
     if not sid:
         return jsonify({"files": []})
-
     sdir = session_dir(sid)
     order_file = sdir / "order.txt"
-
     if not order_file.exists():
         return jsonify({"files": []})
-
     result = []
-
     for line in order_file.read_text().splitlines():
         if "|||" not in line:
             continue
-
         safe, orig = line.split("|||", 1)
-
-        result.append({
-            "id": safe,
-            "name": orig,
-            "ext": Path(orig).suffix.lower()
-        })
-
+        result.append({"id": safe, "name": orig,
+                       "ext": Path(orig).suffix.lower()})
     return jsonify({"files": result})
 
 
 @app.route("/reorder", methods=["POST"])
 def reorder():
     sid = session.get("sid")
-
     if not sid:
         return jsonify({"ok": False}), 400
-
     sdir = session_dir(sid)
     order_file = sdir / "order.txt"
-
     new_ids = request.json.get("ids", [])
-
     if not order_file.exists():
         return jsonify({"ok": False}), 400
 
     mapping = {}
-
     for line in order_file.read_text().splitlines():
         if "|||" in line:
             safe, orig = line.split("|||", 1)
             mapping[safe] = orig
 
-    new_lines = [
-        f"{nid}|||{mapping[nid]}"
-        for nid in new_ids
-        if nid in mapping
-    ]
+    new_lines = [f"{nid}|||{mapping[nid]}" for nid in new_ids if nid in mapping]
+    order_file.write_text("\n".join(new_lines))
+    return jsonify({"ok": True})
 
+
+@app.route("/remove", methods=["POST"])
+def remove():
+    sid = session.get("sid")
+    if not sid:
+        return jsonify({"ok": False}), 400
+    sdir = session_dir(sid)
+    order_file = sdir / "order.txt"
+    file_id = request.json.get("id")
+    if not order_file.exists():
+        return jsonify({"ok": False}), 400
+
+    lines = order_file.read_text().splitlines()
+    new_lines = [l for l in lines if not l.startswith(file_id + "|||")]
     order_file.write_text("\n".join(new_lines))
 
+    target = sdir / file_id
+    if target.exists():
+        target.unlink()
+    return jsonify({"ok": True})
+
+
+@app.route("/clear", methods=["POST"])
+def clear():
+    sid = session.get("sid")
+    if not sid:
+        return jsonify({"ok": True})
+    sdir = session_dir(sid)
+    if sdir.exists():
+        shutil.rmtree(sdir)
+    sdir.mkdir(parents=True, exist_ok=True)
     return jsonify({"ok": True})
 
 
