@@ -189,6 +189,103 @@ def merge():
         return jsonify({"error": str(e)}), 500
 
 
+def pdf_to_docx(pdf_path, output_path):
+    from pdf2docx import Converter
+    cv = Converter(pdf_path)
+    try:
+        cv.convert(output_path)
+    finally:
+        cv.close()
+    return output_path
+
+
+def pdf_to_pptx(pdf_path, output_path):
+    import pymupdf
+    from pptx import Presentation
+    from pptx.util import Emu, Pt
+    from pptx.dml.color import RGBColor
+
+    doc = pymupdf.open(pdf_path)
+    try:
+        if doc.page_count == 0:
+            raise ValueError("The PDF has no pages.")
+
+        prs = Presentation()
+        first_page = doc[0]
+        prs.slide_width = Emu(int(first_page.rect.width * PT_TO_EMU))
+        prs.slide_height = Emu(int(first_page.rect.height * PT_TO_EMU))
+        blank_layout = prs.slide_layouts[6]
+
+        for page in doc:
+            slide = prs.slides.add_slide(blank_layout)
+
+            for img_info in page.get_image_info(xrefs=True):
+                xref = img_info.get("xref", 0)
+                bbox = img_info["bbox"]
+                if not xref or bbox[2] <= bbox[0] or bbox[3] <= bbox[1]:
+                    continue
+                try:
+                    image_bytes = doc.extract_image(xref)["image"]
+                    slide.shapes.add_picture(
+                        io.BytesIO(image_bytes),
+                        Emu(int(bbox[0] * PT_TO_EMU)),
+                        Emu(int(bbox[1] * PT_TO_EMU)),
+                        Emu(int((bbox[2] - bbox[0]) * PT_TO_EMU)),
+                        Emu(int((bbox[3] - bbox[1]) * PT_TO_EMU)),
+                    )
+                except Exception:
+                    pass
+
+            for block in page.get_text("dict").get("blocks", []):
+                if block.get("type") != 0:
+                    continue
+                bx0, by0, bx1, by1 = block["bbox"]
+                if bx1 <= bx0 or by1 <= by0:
+                    continue
+
+                textbox = slide.shapes.add_textbox(
+                    Emu(int(bx0 * PT_TO_EMU)), Emu(int(by0 * PT_TO_EMU)),
+                    Emu(int(max(bx1 - bx0, 10) * PT_TO_EMU)),
+                    Emu(int(max(by1 - by0, 10) * PT_TO_EMU)),
+                )
+                tf = textbox.text_frame
+                tf.word_wrap = True
+                for margin in ("margin_left", "margin_right", "margin_top", "margin_bottom"):
+                    setattr(tf, margin, 0)
+
+                first_para = True
+                for line in block.get("lines", []):
+                    para = tf.paragraphs[0] if first_para else tf.add_paragraph()
+                    first_para = False
+                    for span in line.get("spans", []):
+                        text = span.get("text", "")
+                        if not text:
+                            continue
+                        run = para.add_run()
+                        run.text = text
+                        run.font.size = Pt(max(span.get("size", 12), 6))
+                        flags = span.get("flags", 0)
+                        run.font.bold = bool(flags & (1 << 4))
+                        run.font.italic = bool(flags & (1 << 1))
+                        font_name = span.get("font", "")
+                        if font_name:
+                            run.font.name = font_name.split("-")[0].split(",")[0]
+                        color_int = span.get("color", 0)
+                        try:
+                            run.font.color.rgb = RGBColor(
+                                (color_int >> 16) & 255,
+                                (color_int >> 8) & 255,
+                                color_int & 255,
+                            )
+                        except Exception:
+                            pass
+
+        prs.save(output_path)
+        return output_path
+    finally:
+        doc.close()
+
+
 def merge_pdfs(paths):
     from pypdf import PdfWriter, PdfReader
     writer = PdfWriter()
