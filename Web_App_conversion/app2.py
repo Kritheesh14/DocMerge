@@ -3,6 +3,7 @@ import os
 import shutil
 import tempfile
 import uuid
+import zipfile
 from pathlib import Path
 
 from flask import Flask, jsonify, render_template, request, send_file, session
@@ -137,6 +138,89 @@ def clear():
         shutil.rmtree(sdir)
     sdir.mkdir(parents=True, exist_ok=True)
     return jsonify({"ok": True})
+
+
+@app.route("/merge", methods=["POST"])
+def merge():
+    sid = session.get("sid")
+    if not sid:
+        return jsonify({"error": "No session"}), 400
+    sdir = session_dir(sid)
+    order_file = sdir / "order.txt"
+    if not order_file.exists():
+        return jsonify({"error": "No files uploaded"}), 400
+
+    entries = [(line.split("|||")[0], line.split("|||")[1])
+               for line in order_file.read_text().splitlines() if "|||" in line]
+    if len(entries) < 2:
+        return jsonify({"error": "Upload at least 2 files"}), 400
+
+    req_data = request.get_json(silent=True) or {}
+    custom_name = req_data.get("filename", "").strip()
+    if not custom_name:
+        custom_name = "merged"
+
+    paths = [str(sdir / safe) for safe, _ in entries]
+    exts = {Path(orig).suffix.lower() for _, orig in entries}
+    all_pdf  = exts <= {".pdf"}
+    all_pptx = exts <= {".pptx", ".ppt"}
+
+    mode = (req_data.get("mode") or "auto").lower()
+    if mode == "pdf" and not all_pdf:
+        return jsonify({"error": "Queue contains presentations. Use Mixed."}), 400
+    if mode in ("pptx", "ppt") and not all_pptx:
+        return jsonify({"error": "Queue contains PDFs. Use Mixed."}), 400
+    use_mixed = mode == "mixed" or (mode == "auto" and not (all_pdf or all_pptx))
+
+    try:
+        if not use_mixed and all_pdf:
+            out, mime, dl_name = merge_pdfs(paths), "application/pdf", f"{custom_name}.pdf"
+        elif not use_mixed and all_pptx:
+            out, mime, dl_name = (merge_pptx(paths),
+                                  "application/vnd.openxmlformats-officedocument"
+                                  ".presentationml.presentation",
+                                  f"{custom_name}.pptx")
+        else:
+            return jsonify({"error": "Mixed mode conversion not yet fully configured."}), 400
+
+        return send_file(out, mimetype=mime,
+                         as_attachment=True, download_name=dl_name)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+def merge_pdfs(paths):
+    from pypdf import PdfWriter, PdfReader
+    writer = PdfWriter()
+    for p in paths:
+        for page in PdfReader(p).pages:
+            writer.add_page(page)
+    out = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
+    writer.write(out)
+    out.close()
+    return out.name
+
+
+def merge_pptx(paths):
+    import copy
+    from pptx import Presentation
+    base = Presentation(paths[0])
+    for p in paths[1:]:
+        src = Presentation(p)
+        for slide in src.slides:
+            layout_idx = min(
+                len(base.slide_layouts) - 1,
+                src.slides.index(slide)
+            )
+            new_slide = base.slides.add_slide(base.slide_layouts[layout_idx])
+            for ph in new_slide.placeholders:
+                ph._element.getparent().remove(ph._element)
+            for shape in slide.shapes:
+                new_slide.shapes._spTree.insert(2, copy.deepcopy(shape._element))
+    out = tempfile.NamedTemporaryFile(suffix=".pptx", delete=False)
+    out.close()
+    base.save(out.name)
+    return out.name
 
 
 if __name__ == "__main__":
