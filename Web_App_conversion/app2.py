@@ -201,6 +201,67 @@ def merge():
         return jsonify({"error": str(e)}), 500
 
 
+DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+PPTX_MIME = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+
+
+@app.route("/convert/<kind>", methods=["POST"])
+def convert(kind):
+    converters = {"word": (pdf_to_docx, ".docx", DOCX_MIME), "ppt": (pdf_to_pptx, ".pptx", PPTX_MIME)}
+    if kind not in converters:
+        return jsonify({"error": "Unknown conversion."}), 404
+    fn, ext, mime = converters[kind]
+
+    tmpdir = tempfile.mkdtemp(prefix="conv_")
+    try:
+        sources = []
+        f = request.files.get("file")
+        if f:
+            if not f.filename or Path(f.filename).suffix.lower() != ".pdf":
+                return jsonify({"error": "Please provide a PDF file."}), 400
+            src = os.path.join(tmpdir, "input.pdf")
+            f.save(src)
+            sources.append((src, Path(f.filename).stem))
+        else:
+            sid = session.get("sid")
+            order_file = session_dir(sid) / "order.txt" if sid else None
+            if not order_file or not order_file.exists():
+                return jsonify({"error": "No files uploaded"}), 400
+            mapping = dict(line.split("|||", 1) for line in order_file.read_text().splitlines() if "|||" in line)
+            for fid in (request.get_json(silent=True) or {}).get("ids", []):
+                orig = mapping.get(fid)
+                if orig and Path(orig).suffix.lower() == ".pdf":
+                    sources.append((str(session_dir(sid) / fid), Path(orig).stem))
+        if not sources:
+            return jsonify({"error": "No PDF files to convert."}), 400
+
+        results, used = [], set()
+        for i, (src, stem) in enumerate(sources):
+            name, n = f"{stem}{ext}", 2
+            while name in used:
+                name, n = f"{stem} ({n}){ext}", n + 1
+            used.add(name)
+            out = os.path.join(tmpdir, f"out_{i}{ext}")
+            try:
+                fn(src, out)
+            except Exception as e:
+                return jsonify({"error": f"Conversion failed for {stem}.pdf: {e}"}), 500
+            results.append((out, name))
+
+        if len(results) == 1:
+            data = io.BytesIO(Path(results[0][0]).read_bytes())
+            return send_file(data, mimetype=mime, as_attachment=True, download_name=results[0][1])
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, "w", zipfile.ZIP_DEFLATED) as z:
+            for out, name in results:
+                z.write(out, name)
+        data.seek(0)
+        return send_file(data, mimetype="application/zip", as_attachment=True,
+                         download_name=f"converted_{kind}.zip")
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
 def pdf_to_docx(pdf_path, output_path):
     from pdf2docx import Converter
     cv = Converter(pdf_path)
