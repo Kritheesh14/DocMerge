@@ -181,7 +181,19 @@ def merge():
                                   ".presentationml.presentation",
                                   f"{custom_name}.pptx")
         else:
-            return jsonify({"error": "Mixed mode conversion not yet fully configured."}), 400
+            pdf_paths = []
+            tmpdir = tempfile.mkdtemp()
+            try:
+                for safe, orig in entries:
+                    p = str(sdir / safe)
+                    if Path(orig).suffix.lower() == ".pdf":
+                        pdf_paths.append(p)
+                    else:
+                        pdf_paths.append(pptx_to_pdf(p, tmpdir))
+                out = merge_pdfs(pdf_paths)
+            finally:
+                shutil.rmtree(tmpdir, ignore_errors=True)
+            mime, dl_name = "application/pdf", f"{custom_name}.pdf"
 
         return send_file(out, mimetype=mime,
                          as_attachment=True, download_name=dl_name)
@@ -318,6 +330,37 @@ def merge_pptx(paths):
     out.close()
     base.save(out.name)
     return out.name
+
+
+def pptx_to_pdf(pptx_path, out_dir):
+    import win32com.client
+    import pythoncom
+    
+    pythoncom.CoInitialize()
+    
+    abs_pptx_path = os.path.abspath(pptx_path)
+    output_pdf_path = os.path.abspath(os.path.join(out_dir, Path(pptx_path).stem + ".pdf"))
+    
+    powerpoint = None
+    presentation = None
+    try:
+        powerpoint = win32com.client.DispatchEx("PowerPoint.Application")
+        presentation = powerpoint.Presentations.Open(abs_pptx_path, WithWindow=False)
+        presentation.SaveAs(output_pdf_path, FileFormat=32)
+        
+    except Exception as e:
+        raise RuntimeError(f"Native Windows PowerPoint conversion failed: {str(e)}")
+    finally:
+        if presentation:
+            presentation.Close()
+        if powerpoint:
+            powerpoint.Quit()
+        pythoncom.CoUninitialize()
+            
+    if not os.path.exists(output_pdf_path):
+        raise FileNotFoundError("PowerPoint completed execution, but the output PDF path is missing.")
+        
+    return output_pdf_path
 
 
 if __name__ == "__main__":
