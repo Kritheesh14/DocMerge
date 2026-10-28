@@ -1,3 +1,5 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 :root {
   --bg:        #0e0d0f;
   --bg2:       #141416;
@@ -424,7 +426,7 @@ body.is-dragging { cursor: grabbing; user-select: none; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01s !important; } }
 
 
-/* ===== Staged redesign section 01 ===== */
+/* ===== Staged redesign section 02 ===== */
 /* Merge Studio: dusk glass */
 :root {
   --ink: #0e0d0f; --ink2: #221f25; --frost: #fff; --text: #ede8e3; --muted: rgba(240,232,223,.6); --faint: rgba(240,232,223,.36);
@@ -442,3 +444,14 @@ button, input { font-family: inherit; }
 
 /* ---- living background ---- */
 #bg-noise, .bg-grain { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+
+.bg-grain { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+
+.bg-grain { opacity: .5; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.07'/%3E%3C/svg%3E"); }
+
+/* ---- drop ripple ---- */
+.ripple { fill: none; stroke: var(--ember); stroke-width: 4; pointer-events: none; opacity: 0; transform-box: fill-box; transform-origin: center; animation: ripple 1.2s cubic-bezier(.2,.7,.3,1) var(--d, 0s) forwards; }
+
+@keyframes ripple { 0% { transform: scale(1); opacity: .85; stroke-width: 5; } 100% { transform: scale(3.3); opacity: 0; stroke-width: .5; } }
+
+.hub.landed .hub-fl { animation: pop .5s cubic-bezier(.3,1.6,.5,1); transform-box: fill-box; transform-origin: center; }
