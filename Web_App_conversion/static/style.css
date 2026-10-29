@@ -426,7 +426,7 @@ body.is-dragging { cursor: grabbing; user-select: none; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01s !important; } }
 
 
-/* ===== Staged redesign section 08 ===== */
+/* ===== Staged redesign section 09 ===== */
 /* Merge Studio: dusk glass */
 :root {
   --ink: #0e0d0f; --ink2: #221f25; --frost: #fff; --text: #ede8e3; --muted: rgba(240,232,223,.6); --faint: rgba(240,232,223,.36);
@@ -513,3 +513,16 @@ button, input { font-family: inherit; }
 .console.is-open .hub .hub-x { display: inline; }
 
 .console.busy .hub { pointer-events: none; }
+
+.hub-spin { fill: none; stroke: #fff; stroke-width: 3.5; stroke-linecap: round; stroke-dasharray: 70 496; opacity: 0; transform-origin: 0 0; }
+
+.console.busy .hub-spin { opacity: 1; animation: spin 1s linear infinite; }
+
+.petal { --acc: var(--ember); outline: none; cursor: pointer; opacity: 0; visibility: hidden; pointer-events: none; filter: drop-shadow(0 10px 18px rgba(0,0,0,.4));
+  transform-box: fill-box; transform-origin: center; transform: translate(var(--tx), var(--ty)) scale(.3);
+  transition: transform .5s cubic-bezier(.2,.9,.25,1.12) calc(var(--i, 0) * 50ms), opacity .3s calc(var(--i, 0) * 50ms), visibility 0s .55s; }
+
+.console.is-open .petal.main, .console[data-exp="merge"] .petal.kid[data-parent="merge"], .console[data-exp="convert"] .petal.kid[data-parent="convert"] {
+  opacity: 1; visibility: visible; pointer-events: auto; transform: none; transition-delay: calc(var(--i, 0) * 50ms), calc(var(--i, 0) * 50ms), 0s; }
+
+.console[data-exp="merge"] .petal.main[data-op="merge"], .console[data-exp="convert"] .petal.main[data-op="convert"] { opacity: .35; transform: scale(.93); }
