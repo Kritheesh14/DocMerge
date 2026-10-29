@@ -426,7 +426,7 @@ body.is-dragging { cursor: grabbing; user-select: none; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01s !important; } }
 
 
-/* ===== Staged redesign section 03 ===== */
+/* ===== Staged redesign section 04 ===== */
 /* Merge Studio: dusk glass */
 :root {
   --ink: #0e0d0f; --ink2: #221f25; --frost: #fff; --text: #ede8e3; --muted: rgba(240,232,223,.6); --faint: rgba(240,232,223,.36);
@@ -464,3 +464,14 @@ button, input { font-family: inherit; }
 .nav-wordmark { display: flex; align-items: center; gap: 10px; font: 650 1.25rem var(--display); letter-spacing: -.01em; }
 
 .nav-mark { width: 22px; height: 22px; border-radius: 50%; background: conic-gradient(from 200deg, var(--ember), var(--rose), var(--uv), var(--ember)); box-shadow: inset 0 0 0 5px var(--ink2); outline: 2px solid rgba(255,255,255,.5); }
+
+.nav-tag { font-size: .8rem; color: var(--muted); }
+
+#stage { position: relative; z-index: 5; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 20px 36px; }
+
+#stage.has-files { justify-content: flex-start; }
+
+.site-footer { position: relative; z-index: 5; padding: 16px 40px 22px; text-align: center; font-size: .75rem; color: var(--faint); }
+
+/* ---- console ---- */
+.console { position: relative; width: min(94vw, 640px, 80vh); aspect-ratio: 600 / 460; transition: transform .2s ease-out; }
