@@ -426,7 +426,7 @@ body.is-dragging { cursor: grabbing; user-select: none; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01s !important; } }
 
 
-/* ===== Staged redesign section 06 ===== */
+/* ===== Staged redesign section 08 ===== */
 /* Merge Studio: dusk glass */
 :root {
   --ink: #0e0d0f; --ink2: #221f25; --frost: #fff; --text: #ede8e3; --muted: rgba(240,232,223,.6); --faint: rgba(240,232,223,.36);
@@ -495,3 +495,21 @@ button, input { font-family: inherit; }
 @keyframes breathe { 0% { opacity: .7; transform: scale(1); } 100% { opacity: 0; transform: scale(1.5); } }
 
 .hub-bd { fill: rgba(255,255,255,.35); stroke: rgba(255,255,255,.35); stroke-width: 14; transition: all .25s; }
+
+.hub-fl { fill: url(#hubGrad); stroke: url(#hubGrad); stroke-width: 10; transition: all .25s; filter: drop-shadow(0 14px 26px rgba(238,124,83,.4)); }
+
+.hub:hover .hub-bd, .hub:focus-visible .hub-bd, .console.file-over .hub-bd { fill: #fff; stroke: #fff; }
+
+.hub:hover .hub-fl { filter: drop-shadow(0 16px 34px rgba(238,124,83,.6)); }
+
+.console.file-over .hub { transform: translate(300px, 300px) scale(1.07); }
+
+.hub .hub-lb { fill: var(--ink2); font: 650 25px var(--display); }
+
+.hub .hub-ic { fill: none; stroke: var(--ink2); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+
+.hub .hub-x, .console.is-open .hub .hub-up { display: none; }
+
+.console.is-open .hub .hub-x { display: inline; }
+
+.console.busy .hub { pointer-events: none; }
