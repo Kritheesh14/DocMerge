@@ -426,7 +426,7 @@ body.is-dragging { cursor: grabbing; user-select: none; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01s !important; } }
 
 
-/* ===== Staged redesign section 10 ===== */
+/* ===== Staged redesign section 11 ===== */
 /* Merge Studio: dusk glass */
 :root {
   --ink: #0e0d0f; --ink2: #221f25; --frost: #fff; --text: #ede8e3; --muted: rgba(240,232,223,.6); --faint: rgba(240,232,223,.36);
@@ -536,3 +536,11 @@ button, input { font-family: inherit; }
 .petal .ic { transition: filter .18s; }
 
 .petal .ic path, .petal .ic rect { fill: none; stroke: var(--cream); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+.petal .lb { fill: var(--cream); font: 650 20px var(--display); }
+
+.petal.kid .lb { font-size: 16.5px; }
+
+.petal .sb { fill: rgba(240,232,223,.55); font: 500 10.5px var(--ui); letter-spacing: .05em; }
+
+.petal:hover .gl, .petal.is-hover .gl, .petal:focus-visible .gl { display: inline; }
