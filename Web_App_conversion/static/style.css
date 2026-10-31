@@ -426,7 +426,7 @@ body.is-dragging { cursor: grabbing; user-select: none; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01s !important; } }
 
 
-/* ===== Staged redesign section 09 ===== */
+/* ===== Staged redesign section 10 ===== */
 /* Merge Studio: dusk glass */
 :root {
   --ink: #0e0d0f; --ink2: #221f25; --frost: #fff; --text: #ede8e3; --muted: rgba(240,232,223,.6); --faint: rgba(240,232,223,.36);
@@ -526,3 +526,13 @@ button, input { font-family: inherit; }
   opacity: 1; visibility: visible; pointer-events: auto; transform: none; transition-delay: calc(var(--i, 0) * 50ms), calc(var(--i, 0) * 50ms), 0s; }
 
 .console[data-exp="merge"] .petal.main[data-op="merge"], .console[data-exp="convert"] .petal.main[data-op="convert"] { opacity: .35; transform: scale(.93); }
+
+.petal .gl { display: none; fill: none; stroke: var(--acc); stroke-width: 10; stroke-linejoin: round; filter: url(#glowBlur); }
+
+.petal .bd { fill: none; stroke: rgba(240,232,223,.2); stroke-width: 14; stroke-linejoin: round; transition: stroke .18s; }
+
+.petal .fl { fill: url(#petalGlass); stroke: url(#petalGlass); stroke-width: 10; stroke-linejoin: round; opacity: .62; transition: fill .18s, stroke .18s, opacity .18s; }
+
+.petal .ic { transition: filter .18s; }
+
+.petal .ic path, .petal .ic rect { fill: none; stroke: var(--cream); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
