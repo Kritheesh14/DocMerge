@@ -426,7 +426,7 @@ body.is-dragging { cursor: grabbing; user-select: none; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01s !important; } }
 
 
-/* ===== Staged redesign section 17 ===== */
+/* ===== Staged redesign section 18 ===== */
 /* Merge Studio: dusk glass */
 :root {
   --ink: #0e0d0f; --ink2: #221f25; --frost: #fff; --text: #ede8e3; --muted: rgba(240,232,223,.6); --faint: rgba(240,232,223,.36);
@@ -604,3 +604,14 @@ button, input { font-family: inherit; }
 .legend .tip { color: var(--faint); }
 
 #file-list { display: flex; flex-direction: column; gap: 8px; }
+
+.file-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); border-radius: 16px;
+  cursor: grab; user-select: none; -webkit-user-select: none; transition: background .15s, border-color .15s, opacity .15s, transform .15s; }
+
+.file-row:hover { background: rgba(255,255,255,.14); }
+
+.file-row.dragging { opacity: .35; transform: scale(.98); }
+
+.file-row.drag-target { border-color: var(--sun); box-shadow: 0 0 0 3px rgba(255,194,75,.25); }
+
+#file-list.lifting .file-row { opacity: .55; }
