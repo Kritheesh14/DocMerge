@@ -426,7 +426,7 @@ body.is-dragging { cursor: grabbing; user-select: none; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01s !important; } }
 
 
-/* ===== Staged redesign section 13 ===== */
+/* ===== Staged redesign section 14 ===== */
 /* Merge Studio: dusk glass */
 :root {
   --ink: #0e0d0f; --ink2: #221f25; --frost: #fff; --text: #ede8e3; --muted: rgba(240,232,223,.6); --faint: rgba(240,232,223,.36);
@@ -564,3 +564,13 @@ button, input { font-family: inherit; }
 .petal.disabled:hover .fl, .petal.disabled.is-hover .fl { fill: url(#petalGlass); stroke: url(#petalGlass); }
 
 .petal.disabled:hover .gl, .petal.disabled.is-hover .gl { display: none; }
+
+.petal.disabled:hover .ic, .petal.disabled.is-hover .ic { filter: none; }
+
+.well { fill: rgba(0,0,0,.3); stroke: rgba(240,232,223,.08); opacity: 0; transition: opacity .4s; }
+
+.console.is-open .well { opacity: 1; }
+
+.hub-aura { fill: url(#aura); pointer-events: none; opacity: .85; transition: opacity .4s; }
+
+.console.is-open .hub-aura { opacity: 1; }
