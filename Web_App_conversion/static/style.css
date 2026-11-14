@@ -426,7 +426,7 @@ body.is-dragging { cursor: grabbing; user-select: none; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01s !important; } }
 
 
-/* ===== Staged redesign section 20 ===== */
+/* ===== Staged redesign section 21 ===== */
 /* Merge Studio: dusk glass */
 :root {
   --ink: #0e0d0f; --ink2: #221f25; --frost: #fff; --text: #ede8e3; --muted: rgba(240,232,223,.6); --faint: rgba(240,232,223,.36);
@@ -633,3 +633,13 @@ button, input { font-family: inherit; }
 .row-ext.pptx { background: rgba(179,127,160,.28); color: #e8cddf; }
 
 .row-btns { display: flex; gap: 4px; }
+
+.icon-btn { width: 28px; height: 28px; border-radius: 50%; border: 0; background: rgba(255,255,255,.1); color: var(--muted); font-size: .65rem; cursor: pointer; transition: all .15s; }
+
+.icon-btn:hover { background: rgba(255,255,255,.28); color: #fff; }
+
+.icon-btn.remove:hover { background: #ff5d73; }
+
+#mode-badge { display: none; font-size: .8rem; padding: 10px 14px; border-radius: 14px; background: rgba(255,255,255,.07); border-left: 3px solid; }
+
+#mode-badge.pdf { border-color: var(--ember); }
