@@ -426,7 +426,7 @@ body.is-dragging { cursor: grabbing; user-select: none; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01s !important; } }
 
 
-/* ===== Staged redesign section 18 ===== */
+/* ===== Staged redesign section 19 ===== */
 /* Merge Studio: dusk glass */
 :root {
   --ink: #0e0d0f; --ink2: #221f25; --frost: #fff; --text: #ede8e3; --muted: rgba(240,232,223,.6); --faint: rgba(240,232,223,.36);
@@ -615,3 +615,13 @@ button, input { font-family: inherit; }
 .file-row.drag-target { border-color: var(--sun); box-shadow: 0 0 0 3px rgba(255,194,75,.25); }
 
 #file-list.lifting .file-row { opacity: .55; }
+
+.drag-handle { color: var(--faint); cursor: grab; touch-action: none; letter-spacing: -2px; }
+
+.row-index { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: .72rem; font-weight: 600; flex-shrink: 0; }
+
+.row-index.pdf { background: rgba(255,122,69,.3); color: #ffd8c6; }
+
+.row-index.pptx { background: rgba(179,127,160,.32); color: #ecd3e3; }
+
+.row-name { flex: 1; min-width: 0; font-size: .92rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
