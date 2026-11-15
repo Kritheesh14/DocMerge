@@ -426,7 +426,7 @@ body.is-dragging { cursor: grabbing; user-select: none; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01s !important; } }
 
 
-/* ===== Staged redesign section 22 ===== */
+/* ===== Staged redesign section 23 ===== */
 /* Merge Studio: dusk glass */
 :root {
   --ink: #0e0d0f; --ink2: #221f25; --frost: #fff; --text: #ede8e3; --muted: rgba(240,232,223,.6); --faint: rgba(240,232,223,.36);
@@ -653,3 +653,13 @@ button, input { font-family: inherit; }
 .naming-label { font-size: .75rem; color: var(--muted); }
 
 .naming-input-wrapper { display: flex; align-items: center; padding: 0 16px; border-radius: 999px; background: rgba(0,0,0,.4); border: 1px solid var(--line); transition: border-color .2s, box-shadow .2s; }
+
+.naming-input-wrapper:focus-within { border-color: #fff; box-shadow: 0 0 0 4px rgba(255,255,255,.14); }
+
+.filename-input { flex: 1; background: none; border: 0; outline: 0; color: #fff; font-size: .95rem; padding: 12px 0; }
+
+.filename-ext-preview { color: var(--sun); font-weight: 600; }
+
+.progress-wrap { display: none; height: 3px; border-radius: 99px; background: rgba(255,255,255,.15); overflow: hidden; }
+
+.progress-wrap.active { display: block; }
