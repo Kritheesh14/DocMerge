@@ -426,7 +426,7 @@ body.is-dragging { cursor: grabbing; user-select: none; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01s !important; } }
 
 
-/* ===== Staged redesign section 24 ===== */
+/* ===== Staged redesign section 25 ===== */
 /* Merge Studio: dusk glass */
 :root {
   --ink: #0e0d0f; --ink2: #221f25; --frost: #fff; --text: #ede8e3; --muted: rgba(240,232,223,.6); --faint: rgba(240,232,223,.36);
@@ -671,3 +671,15 @@ button, input { font-family: inherit; }
 @keyframes slide { from { margin-left: -40%; } to { margin-left: 100%; } }
 
 body.is-dragging { cursor: grabbing; user-select: none; }
+
+.drag-chip { position: fixed; z-index: 200; pointer-events: none; transform: translate(14px, 14px); display: flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; font-size: .8rem; font-weight: 600;
+  background: rgba(20,17,22,.85); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.5); box-shadow: 0 12px 34px rgba(0,0,0,.4); }
+
+.drag-chip[data-state="ok"] { border-color: var(--sun); }
+
+.drag-chip[data-state="bad"] { border-color: #ff6b6b; color: #ffb3b3; }
+
+.drag-chip .msg { font-weight: 400; color: var(--muted); }
+
+#toast { position: fixed; bottom: 30px; left: 50%; transform: translate(-50%, 90px); z-index: 300; padding: 11px 22px; border-radius: 999px; font-size: .85rem; white-space: nowrap; opacity: 0; pointer-events: none;
+  background: rgba(20,17,22,.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--line); transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .3s; }
