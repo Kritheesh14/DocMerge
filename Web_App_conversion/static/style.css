@@ -426,7 +426,7 @@ body.is-dragging { cursor: grabbing; user-select: none; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01s !important; } }
 
 
-/* ===== Staged redesign section 23 ===== */
+/* ===== Staged redesign section 24 ===== */
 /* Merge Studio: dusk glass */
 :root {
   --ink: #0e0d0f; --ink2: #221f25; --frost: #fff; --text: #ede8e3; --muted: rgba(240,232,223,.6); --faint: rgba(240,232,223,.36);
@@ -663,3 +663,11 @@ button, input { font-family: inherit; }
 .progress-wrap { display: none; height: 3px; border-radius: 99px; background: rgba(255,255,255,.15); overflow: hidden; }
 
 .progress-wrap.active { display: block; }
+
+.progress-bar { height: 100%; width: 0; background: linear-gradient(90deg, var(--ember), var(--rose), var(--uv)); }
+
+.progress-wrap.indeterminate .progress-bar { width: 40%; animation: slide 1.3s ease-in-out infinite; }
+
+@keyframes slide { from { margin-left: -40%; } to { margin-left: 100%; } }
+
+body.is-dragging { cursor: grabbing; user-select: none; }
