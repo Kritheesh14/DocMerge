@@ -426,7 +426,7 @@ body.is-dragging { cursor: grabbing; user-select: none; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01s !important; } }
 
 
-/* ===== Staged redesign section 25 ===== */
+/* ===== Staged redesign section 26 ===== */
 /* Merge Studio: dusk glass */
 :root {
   --ink: #0e0d0f; --ink2: #221f25; --frost: #fff; --text: #ede8e3; --muted: rgba(240,232,223,.6); --faint: rgba(240,232,223,.36);
@@ -683,3 +683,13 @@ body.is-dragging { cursor: grabbing; user-select: none; }
 
 #toast { position: fixed; bottom: 30px; left: 50%; transform: translate(-50%, 90px); z-index: 300; padding: 11px 22px; border-radius: 999px; font-size: .85rem; white-space: nowrap; opacity: 0; pointer-events: none;
   background: rgba(20,17,22,.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--line); transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .3s; }
+
+#toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+#toast.error { border-color: #ff6b6b; color: #ffb3b3; }
+
+#toast.success { border-color: var(--sun); color: #ffe3a3; }
+
+@media (max-width: 640px) { .top-nav, .site-footer { padding-left: 20px; padding-right: 20px; } .nav-tag { display: none; } }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01s !important; } }
