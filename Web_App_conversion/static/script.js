@@ -27,7 +27,7 @@ const OPS = [
     { op: 'merge:pptx',  label: 'PPT',   sub: '.pptx', a: [164, 196], c: '#b37fa0' },
     { op: 'merge:mixed', label: 'Mixed', sub: '.pdf',  a: [200, 232], c: '#c49a27' } ] },
   { op: 'convert', label: 'Convert', sub: 'from PDF', a: [-32, 32], kids: [
-    { op: 'convert:word', label: 'Word',       sub: '.docx', a: [2, 34],   c: '#8fa6c9' },
+    { op: 'convert:word', label: 'Word',       sub: '.docx', a: [2, 34],   c: '#b9926b' },
     { op: 'convert:ppt',  label: 'PowerPoint', sub: '.pptx', a: [-34, -2], c: '#b37fa0' } ] }
 ];
 
@@ -194,6 +194,17 @@ window.addEventListener('dragover', e => { if (hasFiles(e)) e.preventDefault(); 
 window.addEventListener('dragleave', e => { if (hasFiles(e) && --dragDepth <= 0) { dragDepth = 0; con.classList.remove('file-over'); } });
 window.addEventListener('drop', e => { if (!hasFiles(e)) return; e.preventDefault(); dragDepth = 0; con.classList.remove('file-over'); uploadFiles(e.dataTransfer.files); });
 
+/* ripple from the hub when files land */
+const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function ripple() {
+  if (calm) return;
+  for (let i = 0; i < 3; i++) {
+    const r = mk('circle', { class: 'ripple', cx: CX, cy: CY, r: 82 }); r.style.setProperty('--d', i * 0.16 + 's');
+    ring.insertBefore(r, hub); r.addEventListener('animationend', () => r.remove());
+  }
+  hub.classList.remove('landed'); void hub.getBoundingClientRect(); hub.classList.add('landed');
+}
+
 async function uploadFiles(list) {
   const form = new FormData(); let n = 0;
   for (const f of list) {
@@ -202,7 +213,7 @@ async function uploadFiles(list) {
   }
   fileInput.value = '';
   if (!n) { toast(files.length >= MAX ? `Queue is full (${MAX} files).` : 'Only PDF, PPTX and PPT files are accepted.', 'error'); return; }
-  progress(true);
+  ripple(); progress(true);
   try {
     const d = await (await fetch('/upload', { method: 'POST', body: form })).json();
     if (d.error) { toast(d.error, 'error'); return; }
@@ -300,7 +311,7 @@ void main() {
   float n = neuro(uv * .75, uT * .3);
   float v = pow(clamp((n - .45) / .85, 0., 1.), 2.2);
   v = clamp(v * (.75 + well * 1.4 + uE * .6), 0., 1.4);
-  vec3 ink = vec3(.09, .05, .23), uvc = vec3(.48, .36, 1.), rose = vec3(1., .24, .55), ember = vec3(1., .48, .27);
+  vec3 ink = vec3(.055, .051, .059), uvc = vec3(.48, .36, .44), rose = vec3(.64, .29, .18), ember = vec3(.93, .49, .33);
   vec3 c = mix(uvc, rose, smoothstep(-.7, .7, uv.x + .3 * sin(uT * .2)));
   c = mix(c, ember, smoothstep(.45, 1., v) * .8 + well * .25);
   vec3 col = ink + c * v * .9 + ember * well * .1;
