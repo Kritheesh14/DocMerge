@@ -11,7 +11,7 @@ const stage = $('stage'), con = $('console'), ring = $('ring'), caption = $('con
 let files = [], busy = false, isOpen = false, expanded = null, hoverEl = null, collapseT = null;
 
 /* ---------- ring geometry ---------- */
-const NS = 'http://www.w3.org/2000/svg', CX = 300, CY = 300, INSET = 7, MAIN = [100, 190], KID = [200, 280];
+const NS = 'http://www.w3.org/2000/svg', CX = 300, CY = 300, INSET = 7, MAIN = [100, 186], KID = [194, 292];
 const pt = (a, r) => [CX + r * Math.cos(a * Math.PI / 180), CY - r * Math.sin(a * Math.PI / 180)];
 const mid = (a, r) => pt((a[0] + a[1]) / 2, (r[0] + r[1]) / 2);
 function sector(a, r) {
@@ -31,22 +31,32 @@ const OPS = [
     { op: 'convert:ppt',  label: 'PowerPoint', sub: '.pptx', a: [-34, -2], c: '#b37fa0' } ] }
 ];
 
+const ICONS = {
+  merge: '<path d="m8 6 4-4 4 4"/><path d="M12 2v10.3a4 4 0 0 1-1.17 2.87L4 22"/><path d="m20 22-5-5"/>',
+  convert: '<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
+  'merge:pdf': '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>',
+  'merge:pptx': '<path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/><path d="m10.5 6.5 4 2.5-4 2.5z"/>',
+  'merge:mixed': '<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
+  'convert:word': '<rect x="3" y="3" width="18" height="18" rx="3.5"/><path d="m7 8.5 1.8 7 3.2-5.2 3.2 5.2 1.8-7"/>',
+  'convert:ppt': '<rect x="3" y="3" width="18" height="18" rx="3.5"/><path d="M9.5 17V7.5h3.8a2.9 2.9 0 0 1 0 5.8H9.5"/>'
+};
 function petal(d, r, cls, parent, i) {
   const g = mk('g', { class: `petal ${cls}`, 'data-op': d.op, role: 'button', tabindex: -1, 'aria-label': d.label });
   const [x, y] = mid(d.a, r), [px, py] = parent ? mid(parent.a, MAIN) : [CX, CY];
   g.style.cssText = `--tx:${px - x}px;--ty:${py - y}px;--i:${i};` + (d.c ? `--acc:${d.c}` : '');
   if (parent) g.dataset.parent = parent.op;
   mk('title', {}, g);
-  const p = sector(d.a, r); mk('path', { class: 'bd', d: p }, g); mk('path', { class: 'fl', d: p }, g);
-  mk('text', { class: 'lb', x, y: y - 2 }, g).textContent = d.label;
-  mk('text', { class: 'sb', x, y: y + 17 }, g).textContent = d.sub;
+  const p = sector(d.a, r); mk('path', { class: 'gl', d: p }, g); mk('path', { class: 'bd', d: p }, g); mk('path', { class: 'fl', d: p }, g);
+  mk('g', { class: 'ic', transform: `translate(${x - 14} ${y - 40}) scale(1.17)` }, g).innerHTML = ICONS[d.op];
+  mk('text', { class: 'lb', x, y: y + 10 }, g).textContent = d.label;
+  mk('text', { class: 'sb', x, y: y + 27 }, g).textContent = d.sub;
   ring.appendChild(g);
 }
-mk('circle', { class: 'halo', cx: CX, cy: CY, r: 292 }, ring);
+mk('circle', { class: 'halo', cx: CX, cy: CY, r: 300 }, ring); mk('circle', { class: 'well', cx: CX, cy: CY, r: 94 }, ring);
 OPS.forEach(p => { petal(p, MAIN, 'main', null, 0); p.kids.forEach((k, i) => petal(k, KID, 'kid', p, i)); });
 
 const hub = mk('g', { class: 'hub', role: 'button', tabindex: 0, 'aria-label': 'Upload files', transform: `translate(${CX} ${CY})` }, ring);
-mk('circle', { class: 'hub-glow', r: 80 }, hub); mk('circle', { class: 'hub-bd', r: 80 }, hub); mk('circle', { class: 'hub-fl', r: 80 }, hub);
+mk('circle', { class: 'hub-aura', r: 125 }, hub); mk('circle', { class: 'hub-glow', r: 80 }, hub); mk('circle', { class: 'hub-bd', r: 80 }, hub); mk('circle', { class: 'hub-fl', r: 80 }, hub);
 mk('circle', { class: 'hub-spin', r: 90 }, hub);
 const up = mk('g', { class: 'hub-up' }, hub), xx = mk('g', { class: 'hub-x' }, hub);
 mk('path', { class: 'hub-ic', d: 'M0-14V-38M-12-26L0-38L12-26' }, up);
